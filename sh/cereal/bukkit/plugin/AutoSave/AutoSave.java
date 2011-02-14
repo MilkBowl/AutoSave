@@ -40,7 +40,7 @@ public class AutoSave extends JavaPlugin {
 	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 	private PluginDescriptionFile pdfFile = this.getDescription();
 	private AutoSaveThread saveThread = null;
-	int interval = 60;
+	int interval = 300;
 
 	public AutoSave(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
 		super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -96,12 +96,11 @@ public class AutoSave extends JavaPlugin {
 			// Report and continue
 			log.info(String.format("[%s] IOException while loading config file", pdfFile.getName()));
 		}
-		interval = Integer.parseInt(props.getProperty("interval", "60"));
+		interval = Integer.parseInt(props.getProperty("interval", "300"));
 		
 		// Start our thread
 		saveThread = new AutoSaveThread(this, interval);
 		saveThread.start();
-		log.info(String.format("[%s] AutoSaveThread started", pdfFile.getName()));
 	}
 	
     @Override

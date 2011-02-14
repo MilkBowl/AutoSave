@@ -27,7 +27,7 @@ public class AutoSaveThread extends Thread {
 	protected final Logger log = Logger.getLogger("Minecraft");
 	private boolean run = true;
 	AutoSave plugin = null;
-	int seconds = 300;
+	int interval = 300;
 	
 	// Default constructor
 	AutoSaveThread(AutoSave plugin) {
@@ -35,9 +35,9 @@ public class AutoSaveThread extends Thread {
 	}
 	
 	// Constructor to define number of seconds to sleep
-	AutoSaveThread(AutoSave plugin, int seconds) {
+	AutoSaveThread(AutoSave plugin, int interval) {
 		this(plugin);
-		this.seconds = seconds;
+		this.interval = interval;
 	}
 	
 	// Allows for the thread to naturally exit if value is false
@@ -47,9 +47,10 @@ public class AutoSaveThread extends Thread {
 	
 	// The code to run...weee
     public void run() {
+    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %s seconds", plugin.getDescription().getName(), interval));
     	while(run) {
     		// Do our Sleep stuff!
-			for (int i = 0; i < seconds; i++) {
+			for (int i = 0; i < interval; i++) {
 				try {
 					if(!run) {
 						return;
