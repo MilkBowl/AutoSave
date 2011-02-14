@@ -1,6 +1,12 @@
 package sh.cereal.bukkit.plugin.AutoSave;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.InvalidPropertiesFormatException;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -13,8 +19,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AutoSave extends JavaPlugin {
 	protected final Logger log = Logger.getLogger("Minecraft");
+	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 	private PluginDescriptionFile pdfFile = this.getDescription();
 	private AutoSaveThread saveThread = null;
+	int interval = 60;
 
 	public AutoSave(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
 		super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -22,12 +30,26 @@ public class AutoSave extends JavaPlugin {
 
 	@Override
 	public void onDisable() {
-		// TODO Auto-generated method stub
+		// Stop thread
 		saveThread.setRun(false);
 		try {
 			saveThread.join(5000);
 		} catch (InterruptedException e) {
 			log.info("Could not stop AutoSaveThread");
+		}
+		
+		// Write properties file
+		log.info(String.format("[%s] Saving config file", pdfFile.getName()));
+		Properties props = new Properties();
+		props.setProperty("interval", String.valueOf(interval));
+		try {
+			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
+		} catch (FileNotFoundException e) {
+			// Shouldn't happen...report and continue
+			log.info(String.format("[%s] FileNotFoundException while saving config file", pdfFile.getName()));
+		} catch (IOException e) {
+			// Report and continue
+			log.info(String.format("[%s] IOException while saving config file", pdfFile.getName()));
 		}
 		
 		log.info(String.format("[%s] Version %s is disabled!", pdfFile.getName(), pdfFile.getVersion()));
@@ -38,10 +60,28 @@ public class AutoSave extends JavaPlugin {
 		// Notify on logger load
 		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));
 		
+		// Ensure our folder exists...
+		File dir = new File("plugins/AutoSave");
+		dir.mkdir();
+		
 		// Load configuration
+		log.info(String.format("[%s] Loading config file", pdfFile.getName()));
+		Properties props = new Properties();
+		try {
+			props.loadFromXML(new FileInputStream(CONFIG_FILE_NAME));
+		} catch(FileNotFoundException e) {
+			// Lets ignore it, likely first run of the plugin anyways
+		} catch(InvalidPropertiesFormatException e) {
+			// Report and continue
+			log.info(String.format("[%s] InvalidPropertieFormatException while loading config file", pdfFile.getName()));
+		} catch(IOException e) {
+			// Report and continue
+			log.info(String.format("[%s] IOException while loading config file", pdfFile.getName()));
+		}
+		interval = Integer.parseInt(props.getProperty("interval", "60"));
 		
 		// Start our thread
-		saveThread = new AutoSaveThread(this);
+		saveThread = new AutoSaveThread(this, interval);
 		saveThread.start();
 		log.info(String.format("[%s] AutoSaveThread started", pdfFile.getName()));
 	}
