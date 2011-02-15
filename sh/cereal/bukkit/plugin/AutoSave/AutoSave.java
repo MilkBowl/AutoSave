@@ -71,7 +71,7 @@ public class AutoSave extends JavaPlugin {
 		File dir = new File("plugins/AutoSave");
 		dir.mkdir();
 		
-		// Load configuration
+		// Load configuration 
 		loadConfigFile();
 		
 		// Start our thread
@@ -99,12 +99,17 @@ public class AutoSave extends JavaPlugin {
 	
 	public void loadConfigFile() {
 		log.info(String.format("[%s] Loading config file", pdfFile.getName()));
+		File confFile = new File(CONFIG_FILE_NAME);
+		if(!confFile.exists()) {
+			writeConfigFile();
+		}
+		
 		Properties props = new Properties();
 		try {
-			props.loadFromXML(new FileInputStream(CONFIG_FILE_NAME));
+			props.loadFromXML(new FileInputStream(confFile));
 		} catch(FileNotFoundException e) {
-			// First run of the plugin, time to make the file!!!
-			writeConfigFile();
+			// Hmmm, shouldnt happen...
+			log.info(String.format("[%s] FileNotFoundException while loading config file", pdfFile.getName()));
 		} catch(InvalidPropertiesFormatException e) {
 			// Report and continue
 			log.info(String.format("[%s] InvalidPropertieFormatException while loading config file", pdfFile.getName()));
