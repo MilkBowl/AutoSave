@@ -40,7 +40,7 @@ public class AutoSave extends JavaPlugin {
 	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 	private PluginDescriptionFile pdfFile = this.getDescription();
 	private AutoSaveThread saveThread = null;
-	int interval = 300;
+	private AutoSaveConfig config = new AutoSaveConfig();
 
 	public AutoSave(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
 		super(pluginLoader, instance, desc, folder, plugin, cLoader);
@@ -56,19 +56,8 @@ public class AutoSave extends JavaPlugin {
 			log.info("Could not stop AutoSaveThread");
 		}
 		
-		// Write properties file
-		log.info(String.format("[%s] Saving config file", pdfFile.getName()));
-		Properties props = new Properties();
-		props.setProperty("interval", String.valueOf(interval));
-		try {
-			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
-		} catch (FileNotFoundException e) {
-			// Shouldn't happen...report and continue
-			log.info(String.format("[%s] FileNotFoundException while saving config file", pdfFile.getName()));
-		} catch (IOException e) {
-			// Report and continue
-			log.info(String.format("[%s] IOException while saving config file", pdfFile.getName()));
-		}
+		// Write Config File
+		writeConfigFile();
 		
 		log.info(String.format("[%s] Version %s is disabled!", pdfFile.getName(), pdfFile.getVersion()));
 	}
@@ -83,12 +72,39 @@ public class AutoSave extends JavaPlugin {
 		dir.mkdir();
 		
 		// Load configuration
+		loadConfigFile();
+		
+		// Start our thread
+		saveThread = new AutoSaveThread(this, config);
+		saveThread.start();
+	}
+	
+	public void writeConfigFile() {
+		// Write properties file
+		log.info(String.format("[%s] Saving config file", pdfFile.getName()));
+		Properties props = new Properties();
+		props.setProperty("announce.message", config.announceMessage);
+		props.setProperty("broadcast.enable", String.valueOf(config.broadcast));
+		props.setProperty("interval", String.valueOf(config.interval));		
+		try {
+			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
+		} catch (FileNotFoundException e) {
+			// Shouldn't happen...report and continue
+			log.info(String.format("[%s] FileNotFoundException while saving config file", pdfFile.getName()));
+		} catch (IOException e) {
+			// Report and continue
+			log.info(String.format("[%s] IOException while saving config file", pdfFile.getName()));
+		}		
+	}
+	
+	public void loadConfigFile() {
 		log.info(String.format("[%s] Loading config file", pdfFile.getName()));
 		Properties props = new Properties();
 		try {
 			props.loadFromXML(new FileInputStream(CONFIG_FILE_NAME));
 		} catch(FileNotFoundException e) {
-			// Lets ignore it, likely first run of the plugin anyways
+			// First run of the plugin, time to make the file!!!
+			writeConfigFile();
 		} catch(InvalidPropertiesFormatException e) {
 			// Report and continue
 			log.info(String.format("[%s] InvalidPropertieFormatException while loading config file", pdfFile.getName()));
@@ -96,11 +112,9 @@ public class AutoSave extends JavaPlugin {
 			// Report and continue
 			log.info(String.format("[%s] IOException while loading config file", pdfFile.getName()));
 		}
-		interval = Integer.parseInt(props.getProperty("interval", "300"));
-		
-		// Start our thread
-		saveThread = new AutoSaveThread(this, interval);
-		saveThread.start();
+		config.interval = Integer.parseInt(props.getProperty("interval", String.valueOf(config.interval)));
+		config.announceMessage = props.getProperty("announce.message", config.announceMessage);
+		config.broadcast = Boolean.parseBoolean(props.getProperty("broadcast.enable", String.valueOf(config.broadcast)));
 	}
 	
     @Override

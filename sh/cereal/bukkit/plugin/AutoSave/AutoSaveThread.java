@@ -26,18 +26,13 @@ public class AutoSaveThread extends Thread {
 	
 	protected final Logger log = Logger.getLogger("Minecraft");
 	private boolean run = true;
-	AutoSave plugin = null;
-	int interval = 300;
-	
-	// Default constructor
-	AutoSaveThread(AutoSave plugin) {
-		this.plugin = plugin;
-	}
+	private AutoSave plugin = null;
+	private AutoSaveConfig config = null;
 	
 	// Constructor to define number of seconds to sleep
-	AutoSaveThread(AutoSave plugin, int interval) {
-		this(plugin);
-		this.interval = interval;
+	AutoSaveThread(AutoSave plugin, AutoSaveConfig config) {
+		this.plugin = plugin;
+		this.config = config;
 	}
 	
 	// Allows for the thread to naturally exit if value is false
@@ -47,10 +42,14 @@ public class AutoSaveThread extends Thread {
 	
 	// The code to run...weee
     public void run() {
-    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %s seconds", plugin.getDescription().getName(), interval));
+    	if(config == null) {
+    		return;
+    	}
+    	
+    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %s seconds", plugin.getDescription().getName(), config.interval));
     	while(run) {
     		// Do our Sleep stuff!
-			for (int i = 0; i < interval; i++) {
+			for (int i = 0; i < config.interval; i++) {
 				try {
 					if(!run) {
 						return;
@@ -63,7 +62,9 @@ public class AutoSaveThread extends Thread {
 			
 			// Save the world
 			plugin.save();
-			plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, "World Auto-Saved"));
+			if(config.broadcast) {
+				plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.announceMessage));
+			}
 		}
     }
 
