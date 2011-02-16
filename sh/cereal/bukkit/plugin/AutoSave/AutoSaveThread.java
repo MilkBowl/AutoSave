@@ -18,6 +18,7 @@
 
 package sh.cereal.bukkit.plugin.AutoSave;
 
+import java.util.Date;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -28,6 +29,7 @@ public class AutoSaveThread extends Thread {
 	private boolean run = true;
 	private AutoSave plugin = null;
 	private AutoSaveConfig config = null;
+	private Date lastSave = null;
 	
 	// Constructor to define number of seconds to sleep
 	AutoSaveThread(AutoSave plugin, AutoSaveConfig config) {
@@ -38,6 +40,10 @@ public class AutoSaveThread extends Thread {
 	// Allows for the thread to naturally exit if value is false
 	public void setRun(boolean run) {
 		this.run = run;
+	}
+	
+	public Date getLastSave() {
+		return lastSave;
 	}
 	
 	// The code to run...weee
@@ -62,8 +68,9 @@ public class AutoSaveThread extends Thread {
 			
 			// Save the world
 			plugin.save();
+			lastSave = new Date();
 			if(config.broadcast) {
-				plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.announceMessage));
+				plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.broadcastMessage));
 			}
 		}
     }
