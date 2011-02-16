@@ -1,0 +1,27 @@
+Version 1.0.1
+    * Typos in configuration file
+
+Version 1.0.0
+    * Added support for permissions (yay!)
+    * All messages are user defined via configuration file!
+    * Added additional commands:
+          o /save status
+          o /save toggle
+          o /save interval
+          o /save broadcast
+          o /save version
+
+Version 0.0.4
+    * Fix properties file generation on first run
+
+Version 0.0.3
+    * Configurable announcement message
+    * Toggle the use of the broadcast message
+    * Configuration file now writes on start if no file is found
+
+Version 0.0.2
+    * Default is now 300 seconds (5 minutes)
+    * Interval is now logged on Thread Start
+
+Version 0.0.1
+    * Initial functionality and first release!
