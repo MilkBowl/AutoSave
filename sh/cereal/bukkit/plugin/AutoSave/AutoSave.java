@@ -115,8 +115,8 @@ public class AutoSave extends JavaPlugin {
 		props.setProperty("command.intervalnotanumber", config.commandIntervalNotANnumber);
 		props.setProperty("command.intervalchangesuccess", config.commandIntervalChangeSuccess);
 		props.setProperty("command.intervallookup", config.commandIntervalLookup);
-		props.setProperty("command.broadcacstchangesuccess", config.commandBroadcastChangeSuccess);
-		props.setProperty("command.broadcacstlookup", config.commandBroadcastLookup);
+		props.setProperty("command.broadcastchangesuccess", config.commandBroadcastChangeSuccess);
+		props.setProperty("command.broadcastlookup", config.commandBroadcastLookup);
 		props.setProperty("command.on", config.commandOn);
 		props.setProperty("command.off", config.commandOff);
 		props.setProperty("command.broadcastnotvalid", config.commandBroadcastNotValid);
@@ -167,8 +167,8 @@ public class AutoSave extends JavaPlugin {
 		config.commandIntervalNotANnumber = props.getProperty("command.intervalnotanumber", config.commandIntervalNotANnumber);
 		config.commandIntervalChangeSuccess = props.getProperty("command.intervalchangesuccess", config.commandIntervalChangeSuccess);
 		config.commandIntervalLookup = props.getProperty("command.intervallookup", config.commandIntervalLookup);
-		config.commandBroadcastChangeSuccess = props.getProperty("command.broadcacstchangesuccess", config.commandBroadcastChangeSuccess);
-		config.commandBroadcastLookup = props.getProperty("command.broadcacstlookup", config.commandBroadcastLookup);
+		config.commandBroadcastChangeSuccess = props.getProperty("command.broadcastchangesuccess", config.commandBroadcastChangeSuccess);
+		config.commandBroadcastLookup = props.getProperty("command.broadcastlookup", config.commandBroadcastLookup);
 		config.commandOn = props.getProperty("command.on", config.commandOn);
 		config.commandOff = props.getProperty("command.off", config.commandOff);
 		config.commandBroadcastNotValid = props.getProperty("command.broadcastnotvalid", config.commandBroadcastNotValid);
