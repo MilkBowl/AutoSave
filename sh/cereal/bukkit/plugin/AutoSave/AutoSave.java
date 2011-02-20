@@ -25,11 +25,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.InvalidPropertiesFormatException;
+import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Server;
+import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -45,13 +47,9 @@ public class AutoSave extends JavaPlugin {
 	protected final Logger log = Logger.getLogger("Minecraft");
 	public static PermissionHandler PERMISSIONS = null;
 	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
-	private PluginDescriptionFile pdfFile = this.getDescription();
+	private PluginDescriptionFile pdfFile = null;
 	private AutoSaveThread saveThread = null;
 	private AutoSaveConfig config = new AutoSaveConfig();
-
-	public AutoSave(PluginLoader pluginLoader, Server instance, PluginDescriptionFile desc, File folder, File plugin, ClassLoader cLoader) {
-		super(pluginLoader, instance, desc, folder, plugin, cLoader);
-	}
 
 	@Override
 	public void onDisable() {
@@ -66,6 +64,9 @@ public class AutoSave extends JavaPlugin {
 
 	@Override
 	public void onEnable() {
+		// Get Plugin Info
+		pdfFile = this.getDescription();
+		
 		// Notify on logger load
 		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));
 		
@@ -94,7 +95,7 @@ public class AutoSave extends JavaPlugin {
 					return;
 				}
 			}
-		}		
+		}
 	}
 	
 	public void writeConfigFile() {
