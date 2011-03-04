@@ -18,30 +18,42 @@
 
 package sh.cereal.bukkit.plugin.AutoSave;
 
+import java.util.ArrayList;
+
 public class AutoSaveConfig {
 
 	// Messages
-	public String broadcastMessage = "World Auto-Saving";
-	public String commandStatusFail = "Auto Save has stopped, check the server logs for more info";
-	public String commandStatusNotRun = "Auto Save is running but has not yet saved.";
-	public String commandStatusSuccess = "Auto Save is running and last saved at {%DATE%}.";
-	public String commandStatusOff = "Auto Save is not running (disabled)";
-	public String commandInsufficientPermissions = "You do not have access to that command.";
-	public String commandStopping = "Stopping Auto Saves";
-	public String commandStarting = "Starting Auto Saves";
-	public String commandSave = "World Saving";
-	public String commandIntervalNotANnumber = "You must enter a valid number, ex: /save interval 300";
-	public String commandIntervalChangeSuccess = "Auto Save interval is now {%INTERVAL%}";
-	public String commandIntervalLookup = "Auto Save interval is {%INTERVAL%}";
-	public String commandBroadcastChangeSuccess = "Auto Save broadcast is now {%BROADCAST%}";
-	public String commandBroadcastLookup = "Auto Save broadcast is {%BROADCAST%}";
-	public String commandOn = "on";
-	public String commandOff = "off";
-	public String commandBroadcastNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
-	public String commandVersion = "AutoSave v{%VERSION%}";
+	public String messageBroadcast = "World Auto-Saving";
+	public String messageStatusFail = "Auto Save has stopped, check the server logs for more info";
+	public String messageStatusNotRun = "Auto Save is running but has not yet saved.";
+	public String messageStatusSuccess = "Auto Save is running and last saved at {%DATE%}.";
+	public String messageStatusOff = "Auto Save is not running (disabled)";
+	public String messageInsufficientPermissions = "You do not have access to that command.";
+	public String messageStopping = "Stopping Auto Saves";
+	public String messageStarting = "Starting Auto Saves";
+	public String messageSaveWorlds = "{%NUMSAVED%} Worlds Saved";
+	public String messageSavePlayers = "Players Saved";
+	public String messageIntervalNotANnumber = "You must enter a valid number, ex: /save interval 300";
+	public String messageIntervalChangeSuccess = "Auto Save interval is now {%INTERVAL%}";
+	public String messageIntervalLookup = "Auto Save interval is {%INTERVAL%}";
+	public String messageBroadcastChangeSuccess = "Auto Save broadcast is now {%BROADCAST%}";
+	public String messageBroadcastLookup = "Auto Save broadcast is {%BROADCAST%}";
+	public String messageBroadcastNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
+	public String messageDebugChangeSuccess = "Auto Save debug is now {%DEBUG%}";
+	public String messageDebugLookup = "Auto Save debug is {%DEBUG%}";
+	public String messageDebugNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
+	public String messageWorldChangeSuccess = "World Save List is now {%WORLDS%}";
+	public String messageWorldLookup = "World Save List is {%WORLDS%}";
+	public String messageVersion = "AutoSave v{%VERSION%}";
 	
 	// Values
-	public int interval = 300;
-	public boolean broadcast = true;
-	public boolean permissions = true;
+	public String valueOn = "on";
+	public String valueOff = "off";	
+	
+	// Variables
+	public int varInterval = 300;
+	public boolean varBroadcast = true;
+	public boolean varPermissions = true;
+	public boolean varDebug = false;
+	public ArrayList<String> varWorlds = null;
 }

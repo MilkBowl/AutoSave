@@ -52,10 +52,10 @@ public class AutoSaveThread extends Thread {
     		return;
     	}
     	
-    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %s seconds", plugin.getDescription().getName(), config.interval));
+    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %s seconds", plugin.getDescription().getName(), config.varInterval));
     	while(run) {
     		// Do our Sleep stuff!
-			for (int i = 0; i < config.interval; i++) {
+			for (int i = 0; i < config.varInterval; i++) {
 				try {
 					if(!run) {
 						return;
@@ -66,11 +66,26 @@ public class AutoSaveThread extends Thread {
 				}
 			}
 			
-			// Save the world
-			plugin.save();
+			// Save the players
+			plugin.savePlayers();
+			if(config.varDebug) {
+				log.info(String.format("[%s] Saved Players", plugin.getDescription().getName()));
+			}
+			
+			// Save the worlds
+			int saved = 0;
+			if(config.varWorlds.contains("*")) {
+				saved += plugin.saveWorlds();
+			} else {
+				saved += plugin.saveWorlds(config.varWorlds);
+			}
+			if(config.varDebug) {
+				log.info(String.format("[%s] Saved %d Worlds", plugin.getDescription().getName(), saved));
+			}
+			
 			lastSave = new Date();
-			if(config.broadcast) {
-				plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.broadcastMessage));
+			if(config.varBroadcast) {
+				plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcast));
 			}
 		}
     }
