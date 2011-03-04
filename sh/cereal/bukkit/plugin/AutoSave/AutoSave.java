@@ -336,7 +336,7 @@ public class AutoSave extends JavaPlugin {
 					}
 					
 					// /save help
-					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save help - Displays this dialog"));
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save help - Displays this dialogue"));
 					
 					// /save toggle
 					if (PERMISSIONS.has(player, "autosave.toggle")) { 
