@@ -132,7 +132,11 @@ public class AutoSave extends JavaPlugin {
 		props.setProperty("var.interval", String.valueOf(config.varInterval));
 		props.setProperty("var.permissions", String.valueOf(config.varPermissions));
 		props.setProperty("var.broadcast", String.valueOf(config.varBroadcast));
-		props.setProperty("var.worlds", Generic.combine(",", config.varWorlds));
+		if(config.varWorlds == null) {
+			props.setProperty("var.worlds", "*");
+		} else {
+			props.setProperty("var.worlds", Generic.combine(",", config.varWorlds));
+		}
 		
 		try {
 			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
