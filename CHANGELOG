@@ -1,3 +1,23 @@
+Version 1.1.2
+    * Forced saves into the main thread
+          o Credit to Xon for his contribution.
+    * Fixed issue where debug statements were being logged even when debug mode was not enabled.
+
+Version 1.1.1
+    * Fixed Null Pointer Exception on first start
+
+Version 1.1.0
+    * Significant changes!
+    * Support for Multi-World saves
+          o Default all worlds save, however configurable per world
+    * Support for Player Saves
+    * Refactored Configuration File (old configurations will update)
+    * Added debug mode to remove unnecessary console messages unless needed
+
+Version 1.0.3
+    * Slight modifications to support latest Bukkit/Minecraft
+    * Requires CraftBukkit 423+
+
 Version 1.0.2
     * Updated per recent changes to Bukkit constructor changes.
 
