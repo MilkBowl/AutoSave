@@ -1,7 +1,7 @@
 name: AutoSave
 main: sh.cereal.bukkit.plugin.AutoSave.AutoSave
 version: 1.1.3
-author: Morgan Humes
+author: Morgan Humes aka Cereal, Xon
 description: >
              Provides automatic world saves at defined intervals.  The focus
              of the plugin is to provide a method to flush changes to disk.
