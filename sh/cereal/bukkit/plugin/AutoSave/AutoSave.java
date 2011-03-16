@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.InvalidPropertiesFormatException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -79,6 +80,29 @@ public class AutoSave extends JavaPlugin {
 		
 		// Start our thread
 		startSaveThread();
+	}
+	
+	
+	public static String join(CharSequence separator,Iterable<? extends Object> elements) 
+	{
+	    StringBuilder builder = new StringBuilder();
+
+	    if (elements != null)
+	    {
+	        Iterator<? extends Object> iter = elements.iterator();
+	        if(iter.hasNext())
+	        {
+	            builder.append( String.valueOf( iter.next() ) );
+	            while(iter.hasNext())
+	            {
+	                builder
+	                    .append( separator )
+	                    .append( String.valueOf( iter.next() ) );
+	            }
+	        }
+	    }
+
+	    return builder.toString();
 	}
 	
 	public void obtainPermissions() {
@@ -135,7 +159,7 @@ public class AutoSave extends JavaPlugin {
 		if(config.varWorlds == null) {
 			props.setProperty("var.worlds", "*");
 		} else {
-			props.setProperty("var.worlds", Generic.combine(",", config.varWorlds));
+			props.setProperty("var.worlds", join(",", config.varWorlds));
 		}
 		
 		try {
@@ -537,7 +561,7 @@ public class AutoSave extends JavaPlugin {
 				}
         		
         		config.varWorlds.add(args[1]);
-        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", Generic.combine(", ", config.varWorlds)));
+        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", join(", ", config.varWorlds)));
         		
         		return true;
         	} else if(args.length == 2 && args[0].equalsIgnoreCase("remworld")) {
@@ -552,7 +576,7 @@ public class AutoSave extends JavaPlugin {
 				}
         		
         		config.varWorlds.remove(args[1]);
-        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", Generic.combine(", ", config.varWorlds)));
+        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", join(", ", config.varWorlds)));
         		
         		return true;
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("world")) {
@@ -566,7 +590,7 @@ public class AutoSave extends JavaPlugin {
 					}
 				}
         		
-        		sender.sendMessage(config.messageWorldLookup.replaceAll("\\{%WORLDS%\\}", Generic.combine(", ", config.varWorlds)));
+        		sender.sendMessage(config.messageWorldLookup.replaceAll("\\{%WORLDS%\\}", join(", ", config.varWorlds)));
         		
         		return true;
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("version")) {

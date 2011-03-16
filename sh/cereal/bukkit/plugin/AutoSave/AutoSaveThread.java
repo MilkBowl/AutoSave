@@ -65,28 +65,38 @@ public class AutoSaveThread extends Thread {
 					log.info("Could not sleep!");
 				}
 			}
+			 
+            // getServer().savePlayers() & World.save() are not listed as explicitly threadsafe. Note; getServer().getWorlds() isn't threadsafe either.
+            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+
+                public void run() {
+        
+                    // Save the players
+                    plugin.savePlayers();
+                    if(config.varDebug) {
+                        log.info(String.format("[%s] Saved Players", plugin.getDescription().getName()));
+                    }
+            
+                    // Save the worlds
+                    int saved = 0;
+                    if(config.varWorlds.contains("*")) {
+                        saved += plugin.saveWorlds();
+                    } else {
+                        saved += plugin.saveWorlds(config.varWorlds);
+                    }
+                    if(config.varDebug) {
+                        log.info(String.format("[%s] Saved %d Worlds", plugin.getDescription().getName(), saved));
+                    }
+                    
+                    lastSave = new Date();
+                    if(config.varBroadcast) {
+                        plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcast));
+                    }            
+                }
+            });
+            
 			
-			// Save the players
-			plugin.savePlayers();
-			if(config.varDebug) {
-				log.info(String.format("[%s] Saved Players", plugin.getDescription().getName()));
-			}
-			
-			// Save the worlds
-			int saved = 0;
-			if(config.varWorlds.contains("*")) {
-				saved += plugin.saveWorlds();
-			} else {
-				saved += plugin.saveWorlds(config.varWorlds);
-			}
-			if(config.varDebug) {
-				log.info(String.format("[%s] Saved %d Worlds", plugin.getDescription().getName(), saved));
-			}
-			
-			lastSave = new Date();
-			if(config.varBroadcast) {
-				plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcast));
-			}
+
 		}
     }
 
