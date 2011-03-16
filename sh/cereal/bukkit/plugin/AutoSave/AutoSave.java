@@ -630,7 +630,7 @@ public class AutoSave extends JavaPlugin {
 				saveThread = null;
 				return true;
 			} catch (InterruptedException e) {
-				log.info("Could not stop AutoSaveThread");
+				log.info(String.format("[%s] Could not stop AutoSaveThread", pdfFile.getName()));
 				return false;
 			}
 		} else {
@@ -641,7 +641,7 @@ public class AutoSave extends JavaPlugin {
     public void savePlayers() {
     	// Save the players
     	if(config.varDebug) {
-    		log.info("Saving players");
+    		log.info(String.format("[%s] Saving players", pdfFile.getName()));
     	}
     	this.getServer().savePlayers();
     }
@@ -653,7 +653,7 @@ public class AutoSave extends JavaPlugin {
     	for(World world : worlds) {
     		if(worldNames.contains(world.getName())) {
     			if(config.varDebug) {
-    				log.info(String.format("Saving the world: %s", world.getName()));
+    				log.info(String.format("[%s] Saving the world: %s", pdfFile.getName(), world.getName()));
     			}
     			world.save();
     			i++;
@@ -668,7 +668,7 @@ public class AutoSave extends JavaPlugin {
     	List<World> worlds = this.getServer().getWorlds();
     	for(World world : worlds) {
     		if(config.varDebug) {
-    			log.info(String.format("Saving the world: %s", world.getName()));
+    			log.info(String.format("[%s] Saving the world: %s", pdfFile.getName(), world.getName()));
     		}
     		world.save();
     		i++;
