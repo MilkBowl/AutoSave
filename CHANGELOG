@@ -1,3 +1,7 @@
+Version 1.1.4
+    * Fixed possible overlap of the "save" command from other plugins *cough* WorldEdit *cough*
+          o autosave is now a new command that does exactly what save still does (save is an alias to autosave).
+
 Version 1.1.3
     * Added checks for proper CraftBukkit builds (ensures the server has the methods used)
 
