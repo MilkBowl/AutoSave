@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.InvalidPropertiesFormatException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
@@ -64,7 +63,7 @@ public class AutoSave extends JavaPlugin {
 	}
 
 	@Override
-	public void onEnable() {
+	public void onEnable() {		
 		// Get Plugin Info
 		pdfFile = this.getDescription();
 		
@@ -77,6 +76,33 @@ public class AutoSave extends JavaPlugin {
 		
 		// Load configuration 
 		loadConfigFile();
+		
+		// Test the waters, make sure we are running a build that has the methods we NEED
+		try {
+			// Check Server
+			Class<?> s = Class.forName("org.bukkit.Server");
+			s.getMethod("savePlayers", new Class[] {});
+			
+			// Check World
+			Class<?> w = Class.forName("org.bukkit.World");
+			w.getMethod("save", new Class[] {});
+		} catch(ClassNotFoundException e) {
+			// Do error stuff
+			log.severe(String.format("[%s] ERROR: Server version is incompatible with %s!", pdfFile.getName(), pdfFile.getName()));
+			log.severe(String.format("[%s] Could not find class \"%s\", disabling!", pdfFile.getName(), e.getMessage()));
+			
+			// Clean up
+			getPluginLoader().disablePlugin(this);
+			return;			
+		} catch(NoSuchMethodException e) {
+			// Do error stuff
+			log.severe(String.format("[%s] ERROR: Server version is incompatible with %s!", pdfFile.getName(), pdfFile.getName()));
+			log.severe(String.format("[%s] Could not find method \"%s\", disabling!", pdfFile.getName(), e.getMessage()));
+			
+			// Clean up
+			getPluginLoader().disablePlugin(this);
+			return;			
+		}
 		
 		// Start our thread
 		startSaveThread();
@@ -595,14 +621,18 @@ public class AutoSave extends JavaPlugin {
     }
     
     public boolean stopSaveThread() {
-		saveThread.setRun(false);
-		try {
-			saveThread.join(5000);
-			saveThread = null;
+		if (saveThread != null) {
+			saveThread.setRun(false);
+			try {
+				saveThread.join(5000);
+				saveThread = null;
+				return true;
+			} catch (InterruptedException e) {
+				log.info("Could not stop AutoSaveThread");
+				return false;
+			}
+		} else {
 			return true;
-		} catch (InterruptedException e) {
-			log.info("Could not stop AutoSaveThread");
-			return false;
 		}
     }
     

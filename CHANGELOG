@@ -1,3 +1,6 @@
+Version 1.1.3
+    * Added checks for proper CraftBukkit builds (ensures the server has the methods used)
+
 Version 1.1.2
     * Forced saves into the main thread
           o Credit to Xon for his contribution.
