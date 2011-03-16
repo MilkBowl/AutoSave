@@ -608,7 +608,9 @@ public class AutoSave extends JavaPlugin {
     
     public void savePlayers() {
     	// Save the players
-    	log.info("Saving players");
+    	if(config.varDebug) {
+    		log.info("Saving players");
+    	}
     	this.getServer().savePlayers();
     }
     
