@@ -334,7 +334,7 @@ public class AutoSave extends JavaPlugin {
     		player = (Player) sender;
         }
 
-        if (commandName.equals("save")) {
+        if (commandName.equals("autosave")) {
         	if(args.length == 0) {
         		// Check Permissions
 				if (player != null && config.varPermissions) {
@@ -610,6 +610,8 @@ public class AutoSave extends JavaPlugin {
         		sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", pdfFile.getVersion())));
         		return true;
         	}
+        } else {
+        	sender.sendMessage(String.format("Unknown command \"%s\" handled by %s", commandName, pdfFile.getName()));
         }
         return false;
     }
