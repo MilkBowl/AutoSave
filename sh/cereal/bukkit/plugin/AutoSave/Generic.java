@@ -18,7 +18,7 @@ public class Generic {
         return false;
     }
     
-	public static String combine(String glue, List<String> s) {
+	public static String join(String glue, List<String> s) {
 		int k = s.size();
 		if (k == 0) {
 			return null;

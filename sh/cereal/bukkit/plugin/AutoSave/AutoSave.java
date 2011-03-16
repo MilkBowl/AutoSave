@@ -82,29 +82,6 @@ public class AutoSave extends JavaPlugin {
 		startSaveThread();
 	}
 	
-	
-	public static String join(CharSequence separator,Iterable<? extends Object> elements) 
-	{
-	    StringBuilder builder = new StringBuilder();
-
-	    if (elements != null)
-	    {
-	        Iterator<? extends Object> iter = elements.iterator();
-	        if(iter.hasNext())
-	        {
-	            builder.append( String.valueOf( iter.next() ) );
-	            while(iter.hasNext())
-	            {
-	                builder
-	                    .append( separator )
-	                    .append( String.valueOf( iter.next() ) );
-	            }
-	        }
-	    }
-
-	    return builder.toString();
-	}
-	
 	public void obtainPermissions() {
 		// Test if Permissions exists
 		if (config.varPermissions) {
@@ -159,7 +136,7 @@ public class AutoSave extends JavaPlugin {
 		if(config.varWorlds == null) {
 			props.setProperty("var.worlds", "*");
 		} else {
-			props.setProperty("var.worlds", join(",", config.varWorlds));
+			props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
 		}
 		
 		try {
@@ -561,7 +538,7 @@ public class AutoSave extends JavaPlugin {
 				}
         		
         		config.varWorlds.add(args[1]);
-        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", join(", ", config.varWorlds)));
+        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
         		
         		return true;
         	} else if(args.length == 2 && args[0].equalsIgnoreCase("remworld")) {
@@ -576,7 +553,7 @@ public class AutoSave extends JavaPlugin {
 				}
         		
         		config.varWorlds.remove(args[1]);
-        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", join(", ", config.varWorlds)));
+        		sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
         		
         		return true;
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("world")) {
@@ -590,7 +567,7 @@ public class AutoSave extends JavaPlugin {
 					}
 				}
         		
-        		sender.sendMessage(config.messageWorldLookup.replaceAll("\\{%WORLDS%\\}", join(", ", config.varWorlds)));
+        		sender.sendMessage(config.messageWorldLookup.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
         		
         		return true;
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("version")) {
