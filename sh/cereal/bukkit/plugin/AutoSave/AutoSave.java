@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
@@ -50,6 +51,16 @@ public class AutoSave extends JavaPlugin {
 	private PluginDescriptionFile pdfFile = null;
 	private AutoSaveThread saveThread = null;
 	private AutoSaveConfig config = new AutoSaveConfig();
+	
+	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
+	static {
+		recommendedBuilds.put("git-Bukkit-0.0.0-544-g6c6c30a-b556jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-544-g6c6c30a-b556jnks (MC: 1.3)", true, 556, true));
+		recommendedBuilds.put("git-Bukkit-0.0.0-516-gdf87bb3-b531jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-516-gdf87bb3-b531jnks (MC: 1.3)", true, 531, true));
+		recommendedBuilds.put("git-Bukkit-0.0.0-512-g63bc855-b527jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-512-g63bc855-b527jnks (MC: 1.3)", true, 527, true));
+		recommendedBuilds.put("git-Bukkit-0.0.0-511-g5fae618-b526jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-511-g5fae618-b526jnks (MC: 1.3)", true, 526, true));
+		recommendedBuilds.put("git-Bukkit-0.0.0-506-g4e9d448-b522jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-506-g4e9d448-b522jnks (MC: 1.3)", true, 522, true));
+		recommendedBuilds.put("git-Bukkit-0.0.0-493-g8b5496e-b493jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-493-g8b5496e-b493jnks (MC: 1.3)", true, 493, true));
+	}
 
 	@Override
 	public void onDisable() {
@@ -66,6 +77,16 @@ public class AutoSave extends JavaPlugin {
 	public void onEnable() {		
 		// Get Plugin Info
 		pdfFile = this.getDescription();
+		
+		// Check Server Version String
+		if(recommendedBuilds.containsKey(getServer().getVersion())) {
+			// Known Build
+			BukkitVersion ver = recommendedBuilds.get(getServer().getVersion());
+			log.info(String.format("[%s] Server Version is %s%d",  pdfFile.getName(), ver.recommendedBuild ? "Recommended Build " : "Build ", ver.buildNumber, ver.supported ? "is supported" : "is NOT supported"));
+		} else {
+			// Unknown Build -- Warn
+			log.warning(String.format("[%s] UNKNOWN SERVER VERSION: It has NOT been tested and %s MAY NOT function properly: %s",  pdfFile.getName(), pdfFile.getName(), getServer().getVersion()));
+		}
 		
 		// Notify on logger load
 		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));
