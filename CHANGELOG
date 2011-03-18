@@ -1,3 +1,12 @@
+Version 1.1.5
+    * Implemented a configurable warning message!
+          o See configuration file for "config.messagewarn" and command "save warn"
+          o If warning time is sent to 0 (config.warntime or command save warn), then there will be no warning.  The broadcast setting does not affect this message.
+    * Added console logging whenever broadcasts are sent.
+          o Anything players see SHOULD also be seen on console - this should now happen. Broadcasts can be disabled/enabled with the command "save broadcast"
+    * Added soft version checking
+          o Warns when not running recommended builds (based upon their version signature) or simply reports the known version if all goes well.
+
 Version 1.1.4
     * Fixed possible overlap of the "save" command from other plugins *cough* WorldEdit *cough*
           o autosave is now a new command that does exactly what save still does (save is an alias to autosave).
