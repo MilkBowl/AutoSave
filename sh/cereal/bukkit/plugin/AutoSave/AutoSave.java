@@ -18,11 +18,16 @@
 
 package sh.cereal.bukkit.plugin.AutoSave;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -30,6 +35,7 @@ import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -50,6 +56,7 @@ public class AutoSave extends JavaPlugin {
 	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 	private PluginDescriptionFile pdfFile = null;
 	private AutoSaveThread saveThread = null;
+	private ReportThread reportThread = null;
 	private AutoSaveConfig config = new AutoSaveConfig();
 	
 	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
@@ -127,6 +134,10 @@ public class AutoSave extends JavaPlugin {
 		
 		// Start our thread
 		startSaveThread();
+		
+		// Make an HTTP request for anonymous statistic collection
+		reportThread = new ReportThread(this, config);
+		reportThread.start();
 	}
 	
 	public void obtainPermissions() {
@@ -174,6 +185,9 @@ public class AutoSave extends JavaPlugin {
 		props.setProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
 		props.setProperty("message.warnlookup", config.messageWarnLookup);
 		props.setProperty("message.warnnotanumber", config.messageWarnNotANnumber);
+		props.setProperty("message.reportlookup", config.messageReportLookup);
+		props.setProperty("message.reportnotvalid", config.messageReportNotValid);
+		props.setProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
 		props.setProperty("value.on", config.valueOn);
@@ -190,6 +204,8 @@ public class AutoSave extends JavaPlugin {
 			props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
 		}
 		props.setProperty("var.warntime", String.valueOf(config.varWarnTime));
+		props.setProperty("var.uuid", config.varUuid.toString());
+		props.setProperty("var.report", String.valueOf(config.varReport));
 		
 		try {
 			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
@@ -317,6 +333,9 @@ public class AutoSave extends JavaPlugin {
 		config.messageWarnChangeSuccess = props.getProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
 		config.messageWarnLookup = props.getProperty("message.warnlookup", config.messageWarnLookup);
 		config.messageWarnNotANnumber = props.getProperty("message.warnnotanumber", config.messageWarnNotANnumber);
+		config.messageReportLookup = props.getProperty("message.reportlookup", config.messageReportLookup);
+		config.messageReportNotValid = props.getProperty("message.reportnotvalid", config.messageReportNotValid);
+		config.messageReportChangeSuccess = props.getProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
 		if(props.containsKey("command.on")) {
@@ -355,6 +374,13 @@ public class AutoSave extends JavaPlugin {
 		String tmpWorlds = props.getProperty("var.worlds", "*");
 		config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));
 		config.varWarnTime = Integer.parseInt(props.getProperty("var.warntime", String.valueOf(config.varWarnTime)));
+		String strUuid = props.getProperty("var.uuid", "");
+		try {
+			config.varUuid = UUID.fromString(strUuid);
+		} catch(IllegalArgumentException e) {
+			config.varUuid = UUID.randomUUID();
+		}
+		config.varReport = Boolean.parseBoolean(props.getProperty("var.report", String.valueOf(config.varReport)));
 	}
 	
     @Override
@@ -617,6 +643,43 @@ public class AutoSave extends JavaPlugin {
     				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageDebugChangeSuccess.replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff))));
     				return true;        			
         		}
+        	} else if(args.length >= 1 && args[0].equalsIgnoreCase("report")) {
+				// Check Permissions
+        		if (player != null && config.varPermissions) {
+					obtainPermissions();
+					if (!PERMISSIONS.has(player, "autosave.report")) {
+						// Permission check failed!
+						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+						return false;
+					}
+				}
+        		
+        		if(args.length == 1) {
+        			// Report report status!
+        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageReportLookup.replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff))));
+        			return true;
+        		} else if(args.length == 2) {
+    				// Change report status!
+    				boolean newSetting = false;
+    				if(args[1].equalsIgnoreCase(config.valueOn)) {
+    					if(reportThread == null || !reportThread.isAlive()) {
+    						reportThread = new ReportThread(this, config);
+    						reportThread.start();
+    					}
+    					newSetting = true;
+    				} else if(args[1].equalsIgnoreCase(config.valueOff)) {
+    					if(reportThread != null) {
+    						reportThread.setRun(false);
+    					}
+    					newSetting = false;
+    				} else {
+    					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageReportNotValid.replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff)));
+    					return false;
+    				}
+    				config.varReport = newSetting;
+    				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageReportChangeSuccess.replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff))));
+    				return true;        			
+        		}        		
         	} else if(args.length == 2 && args[0].equalsIgnoreCase("addworld")) {
 				// Check Permissions
         		if (player != null && config.varPermissions) {
@@ -682,8 +745,10 @@ public class AutoSave extends JavaPlugin {
     }
     
     public boolean startSaveThread() {
-		saveThread = new AutoSaveThread(this, config);
-		saveThread.start();
+    	if(saveThread == null || !saveThread.isAlive()) {
+    		saveThread = new AutoSaveThread(this, config);
+			saveThread.start();
+    	}
     	return true;
     }
     

@@ -58,6 +58,9 @@ public class AutoSaveThread extends Thread {
 			for (int i = 0; i < config.varInterval; i++) {
 				try {
 					if(!run) {
+						if(config.varDebug) {
+							log.info(String.format("[%s] Graceful quit of AutoSaveThread", plugin.getDescription().getName()));
+						}
 						return;
 					}
 					if(config.varWarnTime != 0 && config.varWarnTime + i == config.varInterval) {

@@ -19,6 +19,7 @@
 package sh.cereal.bukkit.plugin.AutoSave;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 public class AutoSaveConfig {
 
@@ -49,12 +50,17 @@ public class AutoSaveConfig {
 	public String messageWorldLookup = "World Save List is {%WORLDS%}";
 	public String messageVersion = "AutoSave v{%VERSION%}";
 	public String messageWarning = "Warning, AutoSave will commence soon.";
+	public String messageReportLookup = "Auto Save report is {%REPORT%}";
+	public String messageReportNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
+	public String messageReportChangeSuccess = "Auto Save report is now {%REPORT%}";
 	
 	// Values
 	public String valueOn = "on";
 	public String valueOff = "off";	
 	
 	// Variables
+	public UUID varUuid;
+	public boolean varReport = true;
 	public int varInterval = 300;
 	public int varWarnTime = 0;
 	public boolean varBroadcast = true;
