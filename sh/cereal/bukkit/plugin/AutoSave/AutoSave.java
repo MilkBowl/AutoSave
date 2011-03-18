@@ -170,6 +170,10 @@ public class AutoSave extends JavaPlugin {
 		props.setProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
 		props.setProperty("message.worldlookup", config.messageWorldLookup);
 		props.setProperty("message.version", config.messageVersion);
+		props.setProperty("message.warning", config.messageWarning);
+		props.setProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
+		props.setProperty("message.warnlookup", config.messageWarnLookup);
+		props.setProperty("message.warnnotanumber", config.messageWarnNotANnumber);
 		
 		// Values
 		props.setProperty("value.on", config.valueOn);
@@ -185,6 +189,7 @@ public class AutoSave extends JavaPlugin {
 		} else {
 			props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
 		}
+		props.setProperty("var.warntime", String.valueOf(config.varWarnTime));
 		
 		try {
 			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
@@ -308,6 +313,10 @@ public class AutoSave extends JavaPlugin {
 		config.messageDebugNotValid = props.getProperty("message.debugnotvalue", config.messageDebugNotValid);
 		config.messageWorldChangeSuccess = props.getProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
 		config.messageWorldLookup = props.getProperty("message.worldlookup", config.messageWorldLookup);
+		config.messageWarning = props.getProperty("message.warning", config.messageWarning);
+		config.messageWarnChangeSuccess = props.getProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
+		config.messageWarnLookup = props.getProperty("message.warnlookup", config.messageWarnLookup);
+		config.messageWarnNotANnumber = props.getProperty("message.warnnotanumber", config.messageWarnNotANnumber);
 		
 		// Values
 		if(props.containsKey("command.on")) {
@@ -345,6 +354,7 @@ public class AutoSave extends JavaPlugin {
 		
 		String tmpWorlds = props.getProperty("var.worlds", "*");
 		config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));
+		config.varWarnTime = Integer.parseInt(props.getProperty("var.warntime", String.valueOf(config.varWarnTime)));
 	}
 	
     @Override
@@ -410,6 +420,11 @@ public class AutoSave extends JavaPlugin {
 						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save broadcast [on|off] - Sets & retrieves the broadcast value"));
 					}
 					
+					// /save warn
+					if (PERMISSIONS.has(player, "autosave.warn")) {
+						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save warn [value] - Sets & retrieves the warn time in seconds"));
+					}
+					
 					// /save version
 					if (PERMISSIONS.has(player, "autosave.version")) {
 						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save version - Prints the version of AutoSave"));
@@ -435,6 +450,8 @@ public class AutoSave extends JavaPlugin {
         			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save broadcast [on|off] - Sets & retrieves the broadcast value"));
         			// save debug
         			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save debug [on|off] - Sets & retrieves the debug value"));
+        			// save warn
+        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save warn [value] - Sets & retrieves the warn time in seconds"));
         			// save version
         			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save version - Prints the version of AutoSave"));        			
         		}
@@ -510,6 +527,33 @@ public class AutoSave extends JavaPlugin {
         				return true;
         			} catch(NumberFormatException e) {
         				sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageIntervalNotANnumber));
+        				return false;
+        			}
+        		}
+        	} else if(args.length >= 1 && args[0].equalsIgnoreCase("warn")) {
+				// Check Permissions
+        		if (player != null && config.varPermissions) {
+					obtainPermissions();
+					if (!PERMISSIONS.has(player, "autosave.warn")) {
+						// Permission check failed!
+						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+						return false;
+					}
+				}
+        		
+        		if(args.length == 1) {
+        			// Report interval!
+        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnLookup.replaceAll("\\{%WARN%\\}", String.valueOf(config.varWarnTime))));
+        			return true;
+        		} else if(args.length == 2) {
+        			// Change interval!
+        			try {
+        				int newWarnTime = Integer.parseInt(args[1]);
+        				config.varWarnTime = newWarnTime;
+        				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnChangeSuccess.replaceAll("\\{%WARN%\\}", String.valueOf(config.varWarnTime))));
+        				return true;
+        			} catch(NumberFormatException e) {
+        				sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageWarnNotANnumber));
         				return false;
         			}
         		}

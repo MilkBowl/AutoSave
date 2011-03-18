@@ -36,6 +36,9 @@ public class AutoSaveConfig {
 	public String messageIntervalNotANnumber = "You must enter a valid number, ex: /save interval 300";
 	public String messageIntervalChangeSuccess = "Auto Save interval is now {%INTERVAL%}";
 	public String messageIntervalLookup = "Auto Save interval is {%INTERVAL%}";
+	public String messageWarnNotANnumber = "You must enter a valid number, ex: /save warn 300";
+	public String messageWarnChangeSuccess = "Auto Save warning time is now {%WARN%}";
+	public String messageWarnLookup = "Auto Save warning time is {%WARN%}";	
 	public String messageBroadcastChangeSuccess = "Auto Save broadcast is now {%BROADCAST%}";
 	public String messageBroadcastLookup = "Auto Save broadcast is {%BROADCAST%}";
 	public String messageBroadcastNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
@@ -45,6 +48,7 @@ public class AutoSaveConfig {
 	public String messageWorldChangeSuccess = "World Save List is now {%WORLDS%}";
 	public String messageWorldLookup = "World Save List is {%WORLDS%}";
 	public String messageVersion = "AutoSave v{%VERSION%}";
+	public String messageWarning = "Warning, AutoSave will commence soon.";
 	
 	// Values
 	public String valueOn = "on";
@@ -52,6 +56,7 @@ public class AutoSaveConfig {
 	
 	// Variables
 	public int varInterval = 300;
+	public int varWarnTime = 0;
 	public boolean varBroadcast = true;
 	public boolean varPermissions = true;
 	public boolean varDebug = false;

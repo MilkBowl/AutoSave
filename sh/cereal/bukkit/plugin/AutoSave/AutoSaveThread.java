@@ -52,13 +52,21 @@ public class AutoSaveThread extends Thread {
     		return;
     	}
     	
-    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %s seconds", plugin.getDescription().getName(), config.varInterval));
+    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %d seconds, Warn Time is %d seconds", plugin.getDescription().getName(), config.varInterval, config.varWarnTime));
     	while(run) {
     		// Do our Sleep stuff!
 			for (int i = 0; i < config.varInterval; i++) {
 				try {
 					if(!run) {
 						return;
+					}
+					if(config.varWarnTime != 0 && config.varWarnTime + i == config.varInterval) {
+						// Perform warning
+						if(config.varDebug) {
+							log.info(String.format("[%s] Warning Time Reached: %d seconds to go.", plugin.getDescription().getName(), config.varInterval - i));
+						}
+						plugin.getServer().broadcastMessage(config.messageWarning);
+						log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.messageWarning));
 					}
 					Thread.sleep(1000);
 				} catch (InterruptedException e) {
@@ -91,6 +99,7 @@ public class AutoSaveThread extends Thread {
                     lastSave = new Date();
                     if(config.varBroadcast) {
                         plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcast));
+                        log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.messageBroadcast));
                     }            
                 }
             });
