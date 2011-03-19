@@ -43,8 +43,11 @@ import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.nijiko.permissions.PermissionHandler;
@@ -54,10 +57,13 @@ public class AutoSave extends JavaPlugin {
 	protected final Logger log = Logger.getLogger("Minecraft");
 	public static PermissionHandler PERMISSIONS = null;
 	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
+	
 	private PluginDescriptionFile pdfFile = null;
 	private AutoSaveThread saveThread = null;
 	private ReportThread reportThread = null;
 	private AutoSaveConfig config = new AutoSaveConfig();
+	private AutoSavePlayerListener playerListener = null;
+	protected int numPlayers = 0;
 	
 	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
 	static {
@@ -95,9 +101,6 @@ public class AutoSave extends JavaPlugin {
 			log.warning(String.format("[%s] UNKNOWN SERVER VERSION: It has NOT been tested and %s MAY NOT function properly: %s",  pdfFile.getName(), pdfFile.getName(), getServer().getVersion()));
 		}
 		
-		// Notify on logger load
-		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));
-		
 		// Ensure our folder exists...
 		File dir = new File("plugins/AutoSave");
 		dir.mkdir();
@@ -132,12 +135,18 @@ public class AutoSave extends JavaPlugin {
 			return;			
 		}
 		
-		// Start our thread
-		startSaveThread();
+		// Register Events -- WEEE
+		playerListener = new AutoSavePlayerListener(this);
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
 		
 		// Make an HTTP request for anonymous statistic collection
 		reportThread = new ReportThread(this, config);
 		reportThread.start();
+		
+		// Notify on logger load
+		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));		
 	}
 	
 	public void obtainPermissions() {
@@ -383,6 +392,20 @@ public class AutoSave extends JavaPlugin {
 		config.varReport = Boolean.parseBoolean(props.getProperty("var.report", String.valueOf(config.varReport)));
 	}
 	
+	public boolean checkPermissions(String permission, Player player) {
+		if(player == null) {
+			return true;
+		} else if(config.varPermissions) {
+			// Permissions -- check it!
+			obtainPermissions();
+			return PERMISSIONS.has(player, permission);
+		} else {
+			// No permissions, default to Op status
+			// All permissions pass or fail on this
+			return player.isOp();
+		}
+	}
+	
     @Override
     public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args) {       
     	String commandName = command.getName().toLowerCase();
@@ -394,13 +417,10 @@ public class AutoSave extends JavaPlugin {
         if (commandName.equals("autosave")) {
         	if(args.length == 0) {
         		// Check Permissions
-				if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.save")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.save", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
 				
 				// Perform save
@@ -417,79 +437,54 @@ public class AutoSave extends JavaPlugin {
 				}
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("help")) {
         		// Shows help for allowed commands
-        		if(player != null) {
-        			// /save
-					if (PERMISSIONS.has(player, "autosave.save")) {
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save - Saves all players & worlds"));
-					}
-					
-					// /save help
-					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save help - Displays this dialogue"));
-					
-					// /save toggle
-					if (PERMISSIONS.has(player, "autosave.toggle")) { 
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save toggle - Toggles the AutoSave system"));
-					}
-					
-					// /save status
-					if (PERMISSIONS.has(player, "autosave.status")) {
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save status - Reports thread status and last run time"));
-					}
-					
-					// /save interval
-					if (PERMISSIONS.has(player, "autosave.interval")) {
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save interval [value] - Sets & retrieves the save interval"));
-					}
-					
-					// /save broadcast
-					if (PERMISSIONS.has(player, "autosave.broadcast")) {
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save broadcast [on|off] - Sets & retrieves the broadcast value"));
-					}
-					
-					// /save warn
-					if (PERMISSIONS.has(player, "autosave.warn")) {
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save warn [value] - Sets & retrieves the warn time in seconds"));
-					}
-					
-					// /save version
-					if (PERMISSIONS.has(player, "autosave.version")) {
-						sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save version - Prints the version of AutoSave"));
-					}
-        		} else {
-        			// save
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save - Saves all players & worlds"));
-        			// save help
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save help - Displays this dialog"));
-        			// save toggle
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save toggle - Toggles the AutoSave system"));
-        			// save status
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save status - Reports thread status and last run time"));
-        			// save interval
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save interval [value] - Sets & retrieves the save interval"));
-        			// save addworld
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save addworld [value] - Adds world to save list"));
-        			// save remworld
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save remworld [value] - Removes world from save list"));
-        			// save world
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save world - Shows worlds on the save list"));
-        			// save broadcast
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save broadcast [on|off] - Sets & retrieves the broadcast value"));
-        			// save debug
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save debug [on|off] - Sets & retrieves the debug value"));
-        			// save warn
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save warn [value] - Sets & retrieves the warn time in seconds"));
-        			// save version
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "save version - Prints the version of AutoSave"));        			
-        		}
+    			// /save
+				if (checkPermissions("autosave.save", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save - Saves all players & worlds"));
+				}
+				
+				// /save help
+				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save help - Displays this dialogue"));
+				
+				// /save toggle
+				if (checkPermissions("autosave.toggle", player)) { 
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save toggle - Toggles the AutoSave system"));
+				}
+				
+				// /save status
+				if (checkPermissions("autosave.status", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save status - Reports thread status and last run time"));
+				}
+				
+				// /save interval
+				if (checkPermissions("autosave.interval", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save interval [value] - Sets & retrieves the save interval"));
+				}
+				
+				// /save broadcast
+				if (checkPermissions("autosave.broadcast", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save broadcast [on|off] - Sets & retrieves the broadcast value"));
+				}
+				
+				// /save report
+				if (checkPermissions("autosave.report", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save report [on|off] - Sets & retrieves the report value"));
+				}				
+				
+				// /save warn
+				if (checkPermissions("autosave.warn", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save warn [value] - Sets & retrieves the warn time in seconds"));
+				}
+				
+				// /save version
+				if (checkPermissions("autosave.version", player)) {
+					sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save version - Prints the version of AutoSave"));
+				}
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.toggle")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.toggle", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
 				
 				// Start thread
@@ -502,13 +497,10 @@ public class AutoSave extends JavaPlugin {
 				}       		
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("status")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.status")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.status", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		// Get Thread Status
@@ -531,13 +523,10 @@ public class AutoSave extends JavaPlugin {
         		}
         	} else if(args.length >= 1 && args[0].equalsIgnoreCase("interval")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.interval")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.interval", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		if(args.length == 1) {
@@ -558,13 +547,10 @@ public class AutoSave extends JavaPlugin {
         		}
         	} else if(args.length >= 1 && args[0].equalsIgnoreCase("warn")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.warn")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.warn", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		if(args.length == 1) {
@@ -585,13 +571,10 @@ public class AutoSave extends JavaPlugin {
         		}
         	} else if(args.length >= 1 && args[0].equalsIgnoreCase("broadcast")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.broadcast")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.broadcast", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		if(args.length == 1) {
@@ -615,13 +598,10 @@ public class AutoSave extends JavaPlugin {
         		}
         	} else if(args.length >= 1 && args[0].equalsIgnoreCase("debug")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.debug")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.debug", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		if(args.length == 1) {
@@ -645,13 +625,10 @@ public class AutoSave extends JavaPlugin {
         		}
         	} else if(args.length >= 1 && args[0].equalsIgnoreCase("report")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.report")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.report", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		if(args.length == 1) {
@@ -682,13 +659,10 @@ public class AutoSave extends JavaPlugin {
         		}        		
         	} else if(args.length == 2 && args[0].equalsIgnoreCase("addworld")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.world.add")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.world.add", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		config.varWorlds.add(args[1]);
@@ -697,13 +671,10 @@ public class AutoSave extends JavaPlugin {
         		return true;
         	} else if(args.length == 2 && args[0].equalsIgnoreCase("remworld")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.world.rem")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.world.rem", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		config.varWorlds.remove(args[1]);
@@ -712,13 +683,10 @@ public class AutoSave extends JavaPlugin {
         		return true;
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("world")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.world")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.world", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		sender.sendMessage(config.messageWorldLookup.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
@@ -726,13 +694,10 @@ public class AutoSave extends JavaPlugin {
         		return true;
         	} else if(args.length == 1 && args[0].equalsIgnoreCase("version")) {
 				// Check Permissions
-        		if (player != null && config.varPermissions) {
-					obtainPermissions();
-					if (!PERMISSIONS.has(player, "autosave.version")) {
-						// Permission check failed!
-						sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
-						return false;
-					}
+				if (!checkPermissions("autosave.version", player)) {
+					// Permission check failed!
+					sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+					return false;
 				}
         		
         		sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", pdfFile.getVersion())));
@@ -744,7 +709,7 @@ public class AutoSave extends JavaPlugin {
         return false;
     }
     
-    public boolean startSaveThread() {
+    protected boolean startSaveThread() {
     	if(saveThread == null || !saveThread.isAlive()) {
     		saveThread = new AutoSaveThread(this, config);
 			saveThread.start();
@@ -752,7 +717,7 @@ public class AutoSave extends JavaPlugin {
     	return true;
     }
     
-    public boolean stopSaveThread() {
+    protected boolean stopSaveThread() {
 		if (saveThread != null) {
 			saveThread.setRun(false);
 			try {
