@@ -165,7 +165,9 @@ public class AutoSave extends JavaPlugin {
 	
 	public void writeConfigFile() {
 		// Log config
-		logObject(config);
+		if(config.varDebug) {
+			logObject(config);
+		}
 		
 		// Write properties file
 		log.info(String.format("[%s] Saving config file", pdfFile.getName()));
@@ -285,38 +287,14 @@ public class AutoSave extends JavaPlugin {
 		//config.messageReportChangeSuccess = props.getProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
-		if(props.containsKey("command.on")) {
-			config.valueOn = props.getProperty("command.on", config.valueOn);
-		} else {
-			config.valueOn = props.getProperty("value.on", config.valueOn);
-		}
-		if(props.containsKey("command.off")) {
-			config.valueOff = props.getProperty("command.off", config.valueOff);
-		} else {
-			config.valueOff = props.getProperty("value.off", config.valueOff);
-		}
+		config.valueOn = props.getProperty("value.on", config.valueOn);
+		config.valueOff = props.getProperty("value.off", config.valueOff);
 		
 		// Variables
-		if(props.containsKey("debug")) {
-			config.varDebug = Boolean.parseBoolean(props.getProperty("debug", String.valueOf(config.varDebug)));
-		} else {
-			config.varDebug = Boolean.parseBoolean(props.getProperty("var.debug", String.valueOf(config.varDebug)));
-		}
-		if(props.containsKey("broadcast.enable")) {
-			config.varBroadcast = Boolean.parseBoolean(props.getProperty("broadcast.enable", String.valueOf(config.varBroadcast)));
-		} else {
-			config.varBroadcast = Boolean.parseBoolean(props.getProperty("var.broadcast", String.valueOf(config.varBroadcast)));
-		}
-		if(props.containsKey("permissions")) {
-			config.varPermissions = Boolean.parseBoolean(props.getProperty("permissions", String.valueOf(config.varPermissions)));
-		} else {
-			config.varPermissions = Boolean.parseBoolean(props.getProperty("var.permissions", String.valueOf(config.varPermissions)));
-		}
-		if(props.containsKey("interval")) {
-			config.varInterval = Integer.parseInt(props.getProperty("interval", String.valueOf(config.varInterval)));
-		} else {
-			config.varInterval = Integer.parseInt(props.getProperty("var.interval", String.valueOf(config.varInterval)));
-		}
+		config.varDebug = Boolean.parseBoolean(props.getProperty("var.debug", String.valueOf(config.varDebug)));
+		config.varBroadcast = Boolean.parseBoolean(props.getProperty("var.broadcast", String.valueOf(config.varBroadcast)));
+		config.varPermissions = Boolean.parseBoolean(props.getProperty("var.permissions", String.valueOf(config.varPermissions)));
+		config.varInterval = Integer.parseInt(props.getProperty("var.interval", String.valueOf(config.varInterval)));
 		
 		String tmpWorlds = props.getProperty("var.worlds", "*");
 		config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));
@@ -329,7 +307,9 @@ public class AutoSave extends JavaPlugin {
 		}
 		config.varReport = Boolean.parseBoolean(props.getProperty("var.report", String.valueOf(config.varReport)));
 		
-		logObject(config);
+		if(config.varDebug) {
+			logObject(config);
+		}
 	}
 	
 	public void logObject(Object o) {
