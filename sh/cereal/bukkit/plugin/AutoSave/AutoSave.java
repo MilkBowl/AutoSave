@@ -180,26 +180,6 @@ public class AutoSave extends JavaPlugin {
 		props.setProperty("message.saveworlds", config.messageSaveWorlds);
 		props.setProperty("message.saveplayers", config.messageSavePlayers);
 		props.setProperty("message.warning", config.messageWarning);
-		//props.setProperty("message.starting", config.messageStarting);
-		//props.setProperty("message.statusfail", config.messageStatusFail);
-		//props.setProperty("message.statusoff", config.messageStatusOff);
-		//props.setProperty("message.statussuccess", config.messageStatusSuccess);
-		//props.setProperty("message.stopping", config.messageStopping);
-		//props.setProperty("message.intervalnotanumber", config.messageIntervalNotANnumber);
-		//props.setProperty("message.intervalchangesuccess", config.messageIntervalChangeSuccess);
-		//props.setProperty("message.intervallookup", config.messageIntervalLookup);
-		//props.setProperty("message.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
-		//props.setProperty("message.broadcastlookup", config.messageBroadcastLookup);
-		//props.setProperty("message.broadcastnotvalid", config.messageBroadcastNotValid);
-		//props.setProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
-		//props.setProperty("message.worldlookup", config.messageWorldLookup);
-		//props.setProperty("message.version", config.messageVersion);
-		//props.setProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
-		//props.setProperty("message.warnlookup", config.messageWarnLookup);
-		//props.setProperty("message.warnnotanumber", config.messageWarnNotANnumber);
-		//props.setProperty("message.reportlookup", config.messageReportLookup);
-		//props.setProperty("message.reportnotvalid", config.messageReportNotValid);
-		//props.setProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
 		props.setProperty("value.on", config.valueOn);
@@ -265,26 +245,6 @@ public class AutoSave extends JavaPlugin {
 		config.messageDebugLookup = props.getProperty("message.debuglookup", config.messageDebugLookup);
 		config.messageDebugNotValid = props.getProperty("message.debugnotvalue", config.messageDebugNotValid);
 		config.messageWarning = props.getProperty("message.warning", config.messageWarning);		
-		//config.messageStarting = props.getProperty("message.starting", config.messageStarting);
-		//config.messageStatusFail = props.getProperty("message.statusfail", config.messageStatusFail);
-		//config.messageStatusOff = props.getProperty("cmessage.statusoff", config.messageStatusOff);
-		//config.messageStatusSuccess = props.getProperty("message.statussuccess", config.messageStatusSuccess);
-		//config.messageStopping = props.getProperty("message.stopping", config.messageStopping);
-		//config.messageIntervalNotANnumber = props.getProperty("message.intervalnotanumber", config.messageIntervalNotANnumber);
-		//config.messageIntervalChangeSuccess = props.getProperty("message.intervalchangesuccess", config.messageIntervalChangeSuccess);
-		//config.messageIntervalLookup = props.getProperty("message.intervallookup", config.messageIntervalLookup);
-		//config.messageBroadcastChangeSuccess = props.getProperty("message.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
-		//config.messageBroadcastLookup = props.getProperty("message.broadcastlookup", config.messageBroadcastLookup);
-		//config.messageBroadcastNotValid = props.getProperty("message.broadcastnotvalid", config.messageBroadcastNotValid);
-		//config.messageVersion = props.getProperty("message.version", config.messageVersion);
-		//config.messageWorldChangeSuccess = props.getProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
-		//config.messageWorldLookup = props.getProperty("message.worldlookup", config.messageWorldLookup);
-		//config.messageWarnChangeSuccess = props.getProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
-		//config.messageWarnLookup = props.getProperty("message.warnlookup", config.messageWarnLookup);
-		//config.messageWarnNotANnumber = props.getProperty("message.warnnotanumber", config.messageWarnNotANnumber);
-		//config.messageReportLookup = props.getProperty("message.reportlookup", config.messageReportLookup);
-		//config.messageReportNotValid = props.getProperty("message.reportnotvalid", config.messageReportNotValid);
-		//config.messageReportChangeSuccess = props.getProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
 		config.valueOn = props.getProperty("value.on", config.valueOn);
