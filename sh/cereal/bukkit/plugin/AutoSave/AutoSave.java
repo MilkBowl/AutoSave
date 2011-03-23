@@ -18,16 +18,13 @@
 
 package sh.cereal.bukkit.plugin.AutoSave;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
-import java.net.URLEncoder;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -167,36 +164,40 @@ public class AutoSave extends JavaPlugin {
 	}
 	
 	public void writeConfigFile() {
+		// Log config
+		logObject(config);
+		
 		// Write properties file
 		log.info(String.format("[%s] Saving config file", pdfFile.getName()));
 		Properties props = new Properties();
 		
 		// Messages
-		props.setProperty("message.broadcast", config.messageBroadcast);
+		props.setProperty("message.broadcastpre", config.messageBroadcastPre);
+		props.setProperty("message.broadcastpost", config.messageBroadcastPost);
 		props.setProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
 		props.setProperty("message.saveworlds", config.messageSaveWorlds);
 		props.setProperty("message.saveplayers", config.messageSavePlayers);
-		props.setProperty("message.starting", config.messageStarting);
-		props.setProperty("message.statusfail", config.messageStatusFail);
-		props.setProperty("message.statusoff", config.messageStatusOff);
-		props.setProperty("message.statussuccess", config.messageStatusSuccess);
-		props.setProperty("message.stopping", config.messageStopping);
-		props.setProperty("message.intervalnotanumber", config.messageIntervalNotANnumber);
-		props.setProperty("message.intervalchangesuccess", config.messageIntervalChangeSuccess);
-		props.setProperty("message.intervallookup", config.messageIntervalLookup);
-		props.setProperty("message.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
-		props.setProperty("message.broadcastlookup", config.messageBroadcastLookup);
-		props.setProperty("message.broadcastnotvalid", config.messageBroadcastNotValid);
-		props.setProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
-		props.setProperty("message.worldlookup", config.messageWorldLookup);
-		props.setProperty("message.version", config.messageVersion);
 		props.setProperty("message.warning", config.messageWarning);
-		props.setProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
-		props.setProperty("message.warnlookup", config.messageWarnLookup);
-		props.setProperty("message.warnnotanumber", config.messageWarnNotANnumber);
-		props.setProperty("message.reportlookup", config.messageReportLookup);
-		props.setProperty("message.reportnotvalid", config.messageReportNotValid);
-		props.setProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
+		//props.setProperty("message.starting", config.messageStarting);
+		//props.setProperty("message.statusfail", config.messageStatusFail);
+		//props.setProperty("message.statusoff", config.messageStatusOff);
+		//props.setProperty("message.statussuccess", config.messageStatusSuccess);
+		//props.setProperty("message.stopping", config.messageStopping);
+		//props.setProperty("message.intervalnotanumber", config.messageIntervalNotANnumber);
+		//props.setProperty("message.intervalchangesuccess", config.messageIntervalChangeSuccess);
+		//props.setProperty("message.intervallookup", config.messageIntervalLookup);
+		//props.setProperty("message.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
+		//props.setProperty("message.broadcastlookup", config.messageBroadcastLookup);
+		//props.setProperty("message.broadcastnotvalid", config.messageBroadcastNotValid);
+		//props.setProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
+		//props.setProperty("message.worldlookup", config.messageWorldLookup);
+		//props.setProperty("message.version", config.messageVersion);
+		//props.setProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
+		//props.setProperty("message.warnlookup", config.messageWarnLookup);
+		//props.setProperty("message.warnnotanumber", config.messageWarnNotANnumber);
+		//props.setProperty("message.reportlookup", config.messageReportLookup);
+		//props.setProperty("message.reportnotvalid", config.messageReportNotValid);
+		//props.setProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
 		props.setProperty("value.on", config.valueOn);
@@ -253,98 +254,35 @@ public class AutoSave extends JavaPlugin {
 		 */
 		
 		// Messages
-		if(props.containsKey("announce.message")) {
-			config.messageBroadcast = props.getProperty("announce.message", config.messageBroadcast);
-		} else {
-			config.messageBroadcast = props.getProperty("message.broadcast", config.messageBroadcast);
-		}
-		if(props.containsKey("command.insufficentpermissions")) {
-			config.messageInsufficientPermissions = props.getProperty("command.insufficentpermissions", config.messageInsufficientPermissions);
-		} else {
-			config.messageInsufficientPermissions = props.getProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
-		}
-		if(props.containsKey("command.saveworlds")) {
-			config.messageSaveWorlds = props.getProperty("command.saveworlds", config.messageSaveWorlds);
-		} else {
-			config.messageSaveWorlds = props.getProperty("message.saveworlds", config.messageSaveWorlds);
-		}
-		if(props.containsKey("command.saveplayers")) {
-			config.messageSavePlayers = props.getProperty("command.saveplayers", config.messageSavePlayers);
-		} else {
-			config.messageSavePlayers = props.getProperty("message.saveplayers", config.messageSavePlayers);
-		}
-		if(props.containsKey("command.starting")) {
-			config.messageStarting = props.getProperty("command.starting", config.messageStarting);
-		} else {
-			config.messageStarting = props.getProperty("message.starting", config.messageStarting);
-		}
-		if(props.containsKey("command.statusfail")) {
-			config.messageStatusFail = props.getProperty("command.statusfail", config.messageStatusFail);
-		} else {
-			config.messageStatusFail = props.getProperty("message.statusfail", config.messageStatusFail);
-		}
-		if(props.containsKey("command.statusoff")) {
-			config.messageStatusOff = props.getProperty("command.statusoff", config.messageStatusOff);
-		} else {
-			config.messageStatusOff = props.getProperty("cmessage.statusoff", config.messageStatusOff);
-		}
-		if(props.containsKey("command.statussuccess")) {
-			config.messageStatusSuccess = props.getProperty("command.statussuccess", config.messageStatusSuccess);
-		} else {
-			config.messageStatusSuccess = props.getProperty("message.statussuccess", config.messageStatusSuccess);
-		}
-		if(props.containsKey("command.stopping")) {
-			config.messageStopping = props.getProperty("command.stopping", config.messageStopping);
-		} else {
-			config.messageStopping = props.getProperty("message.stopping", config.messageStopping);
-		}
-		if(props.containsKey("command.intervalnotanumber")) {
-			config.messageIntervalNotANnumber = props.getProperty("command.intervalnotanumber", config.messageIntervalNotANnumber);
-		} else {
-			config.messageIntervalNotANnumber = props.getProperty("message.intervalnotanumber", config.messageIntervalNotANnumber);
-		}
-		if(props.containsKey("command.intervalchangesuccess")) {
-			config.messageIntervalChangeSuccess = props.getProperty("command.intervalchangesuccess", config.messageIntervalChangeSuccess);
-		} else {
-			config.messageIntervalChangeSuccess = props.getProperty("message.intervalchangesuccess", config.messageIntervalChangeSuccess);
-		}
-		if(props.containsKey("command.intervallookup")) {
-			config.messageIntervalLookup = props.getProperty("command.intervallookup", config.messageIntervalLookup);
-		} else {
-			config.messageIntervalLookup = props.getProperty("message.intervallookup", config.messageIntervalLookup);
-		}
-		if(props.containsKey("command.broadcastchangesuccess")) {
-			config.messageBroadcastChangeSuccess = props.getProperty("command.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
-		} else {
-			config.messageBroadcastChangeSuccess = props.getProperty("message.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
-		}
-		if(props.containsKey("command.broadcastlookup")) {
-			config.messageBroadcastLookup = props.getProperty("command.broadcastlookup", config.messageBroadcastLookup);
-		} else {
-			config.messageBroadcastLookup = props.getProperty("message.broadcastlookup", config.messageBroadcastLookup);
-		}
-		if(props.containsKey("command.broadcastnotvalid")) {
-			config.messageBroadcastNotValid = props.getProperty("command.broadcastnotvalid", config.messageBroadcastNotValid);
-		} else {
-			config.messageBroadcastNotValid = props.getProperty("message.broadcastnotvalid", config.messageBroadcastNotValid);
-		}
-		if(props.containsKey("command.version")) {
-			config.messageVersion = props.getProperty("command.version", config.messageVersion);
-		} else {
-			config.messageVersion = props.getProperty("message.version", config.messageVersion);
-		}
+		config.messageBroadcastPre = props.getProperty("message.broadcastpre", config.messageBroadcastPre);
+		config.messageBroadcastPost = props.getProperty("message.broadcastpost", config.messageBroadcastPost);
+		config.messageInsufficientPermissions = props.getProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
+		config.messageSaveWorlds = props.getProperty("message.saveworlds", config.messageSaveWorlds);
+		config.messageSavePlayers = props.getProperty("message.saveplayers", config.messageSavePlayers);
 		config.messageDebugChangeSuccess = props.getProperty("message.debugchangesuccess", config.messageDebugChangeSuccess);
 		config.messageDebugLookup = props.getProperty("message.debuglookup", config.messageDebugLookup);
 		config.messageDebugNotValid = props.getProperty("message.debugnotvalue", config.messageDebugNotValid);
-		config.messageWorldChangeSuccess = props.getProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
-		config.messageWorldLookup = props.getProperty("message.worldlookup", config.messageWorldLookup);
-		config.messageWarning = props.getProperty("message.warning", config.messageWarning);
-		config.messageWarnChangeSuccess = props.getProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
-		config.messageWarnLookup = props.getProperty("message.warnlookup", config.messageWarnLookup);
-		config.messageWarnNotANnumber = props.getProperty("message.warnnotanumber", config.messageWarnNotANnumber);
-		config.messageReportLookup = props.getProperty("message.reportlookup", config.messageReportLookup);
-		config.messageReportNotValid = props.getProperty("message.reportnotvalid", config.messageReportNotValid);
-		config.messageReportChangeSuccess = props.getProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
+		config.messageWarning = props.getProperty("message.warning", config.messageWarning);		
+		//config.messageStarting = props.getProperty("message.starting", config.messageStarting);
+		//config.messageStatusFail = props.getProperty("message.statusfail", config.messageStatusFail);
+		//config.messageStatusOff = props.getProperty("cmessage.statusoff", config.messageStatusOff);
+		//config.messageStatusSuccess = props.getProperty("message.statussuccess", config.messageStatusSuccess);
+		//config.messageStopping = props.getProperty("message.stopping", config.messageStopping);
+		//config.messageIntervalNotANnumber = props.getProperty("message.intervalnotanumber", config.messageIntervalNotANnumber);
+		//config.messageIntervalChangeSuccess = props.getProperty("message.intervalchangesuccess", config.messageIntervalChangeSuccess);
+		//config.messageIntervalLookup = props.getProperty("message.intervallookup", config.messageIntervalLookup);
+		//config.messageBroadcastChangeSuccess = props.getProperty("message.broadcastchangesuccess", config.messageBroadcastChangeSuccess);
+		//config.messageBroadcastLookup = props.getProperty("message.broadcastlookup", config.messageBroadcastLookup);
+		//config.messageBroadcastNotValid = props.getProperty("message.broadcastnotvalid", config.messageBroadcastNotValid);
+		//config.messageVersion = props.getProperty("message.version", config.messageVersion);
+		//config.messageWorldChangeSuccess = props.getProperty("message.worldchangesuccess", config.messageWorldChangeSuccess);
+		//config.messageWorldLookup = props.getProperty("message.worldlookup", config.messageWorldLookup);
+		//config.messageWarnChangeSuccess = props.getProperty("message.warnchangesuccess", config.messageWarnChangeSuccess);
+		//config.messageWarnLookup = props.getProperty("message.warnlookup", config.messageWarnLookup);
+		//config.messageWarnNotANnumber = props.getProperty("message.warnnotanumber", config.messageWarnNotANnumber);
+		//config.messageReportLookup = props.getProperty("message.reportlookup", config.messageReportLookup);
+		//config.messageReportNotValid = props.getProperty("message.reportnotvalid", config.messageReportNotValid);
+		//config.messageReportChangeSuccess = props.getProperty("message.reportchangesuccess", config.messageReportChangeSuccess);
 		
 		// Values
 		if(props.containsKey("command.on")) {
@@ -390,6 +328,26 @@ public class AutoSave extends JavaPlugin {
 			config.varUuid = UUID.randomUUID();
 		}
 		config.varReport = Boolean.parseBoolean(props.getProperty("var.report", String.valueOf(config.varReport)));
+		
+		logObject(config);
+	}
+	
+	public void logObject(Object o) {
+		String className = o.getClass().getName();
+		// Log the Object
+		for(Field field : o.getClass().getDeclaredFields()) {		
+			// Get our data
+			String name = field.getName();
+			String value = "";
+			try {
+				value = field.get(config).toString();
+			} catch (IllegalAccessException e) {
+				continue;
+			}
+			
+			// Log it
+			log.info(String.format("[%s] %s=%s", className, name, value));
+		}		
 	}
 	
 	public boolean checkPermissions(String permission, Player player) {

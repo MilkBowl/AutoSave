@@ -24,7 +24,8 @@ import java.util.UUID;
 public class AutoSaveConfig {
 
 	// Messages
-	public String messageBroadcast = "World Auto-Saving";
+	public String messageBroadcastPre = "World Auto-Saving";
+	public String messageBroadcastPost = "World Auto-Save Complete";
 	public String messageStatusFail = "Auto Save has stopped, check the server logs for more info";
 	public String messageStatusNotRun = "Auto Save is running but has not yet saved.";
 	public String messageStatusSuccess = "Auto Save is running and last saved at {%DATE%}.";

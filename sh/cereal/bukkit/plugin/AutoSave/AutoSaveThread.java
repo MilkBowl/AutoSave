@@ -81,6 +81,11 @@ public class AutoSaveThread extends Thread {
             plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
 
                 public void run() {
+                	
+                    if(config.varBroadcast && !config.messageBroadcastPre.equals("")) {
+                        plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastPre));
+                        log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.messageBroadcastPre));
+                    }                	
         
                     // Save the players
                     plugin.savePlayers();
@@ -100,10 +105,10 @@ public class AutoSaveThread extends Thread {
                     }
                     
                     lastSave = new Date();
-                    if(config.varBroadcast) {
-                        plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcast));
-                        log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.messageBroadcast));
-                    }            
+                    if(config.varBroadcast && !config.messageBroadcastPost.equals("")) {
+                        plugin.getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastPost));
+                        log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.messageBroadcastPost));
+                    }    
                 }
             });
             
