@@ -145,7 +145,7 @@ public class AutoSave extends JavaPlugin {
 		reportThread.start();
 		
 		// Notify on logger load
-		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));		
+		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));
 	}
 	
 	public void obtainPermissions() {
