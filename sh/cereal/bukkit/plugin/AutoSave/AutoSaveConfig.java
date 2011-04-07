@@ -49,7 +49,7 @@ public class AutoSaveConfig {
 	public String messageDebugNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
 	public String messageWorldChangeSuccess = "World Save List is now {%WORLDS%}";
 	public String messageWorldLookup = "World Save List is {%WORLDS%}";
-	public String messageVersion = "AutoSave v{%VERSION%}";
+	public String messageVersion = "AutoSave v{%VERSION%}, Instance {%UUID%}";
 	public String messageWarning = "Warning, AutoSave will commence soon.";
 	public String messageReportLookup = "Auto Save report is {%REPORT%}";
 	public String messageReportNotValid = "You must enter a valid setting ({%ON%}, {%OFF%})";
@@ -63,7 +63,7 @@ public class AutoSaveConfig {
 	public UUID varUuid;
 	public boolean varReport = true;
 	public int varInterval = 300;
-	public int varWarnTime = 0;
+	public ArrayList<Integer> varWarnTimes = null;
 	public boolean varBroadcast = true;
 	public boolean varPermissions = true;
 	public boolean varDebug = false;

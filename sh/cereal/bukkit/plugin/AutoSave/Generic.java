@@ -18,15 +18,15 @@ public class Generic {
         return false;
     }
     
-	public static String join(String glue, List<String> s) {
+	public static String join(String glue, List<?> s) {
 		int k = s.size();
 		if (k == 0) {
 			return null;
 		}
 		StringBuilder out = new StringBuilder();
-		out.append(s.get(0));
+		out.append(s.get(0).toString());
 		for (int x = 1; x < k; ++x) {
-			out.append(glue).append(s.get(x));
+			out.append(glue).append(s.get(x).toString());
 		}
 		return out.toString();
 	}

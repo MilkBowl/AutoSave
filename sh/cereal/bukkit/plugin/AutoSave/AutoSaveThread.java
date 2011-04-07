@@ -52,7 +52,7 @@ public class AutoSaveThread extends Thread {
     		return;
     	}
     	
-    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %d seconds, Warn Time is %d seconds", plugin.getDescription().getName(), config.varInterval, config.varWarnTime));
+    	log.info(String.format("[%s] AutoSaveThread Started: Interval is %d seconds, Warn Times are %s", plugin.getDescription().getName(), config.varInterval, Generic.join(",", config.varWarnTimes)));
     	while(run) {
     		// Do our Sleep stuff!
 			for (int i = 0; i < config.varInterval; i++) {
@@ -63,7 +63,14 @@ public class AutoSaveThread extends Thread {
 						}
 						return;
 					}
-					if(config.varWarnTime != 0 && config.varWarnTime + i == config.varInterval) {
+					boolean warn = false;
+					for(int w : config.varWarnTimes) {
+						if(w != 0 && w + i == config.varInterval) {
+							warn = true;
+						}
+					}
+					
+					if(warn) {
 						// Perform warning
 						if(config.varDebug) {
 							log.info(String.format("[%s] Warning Time Reached: %d seconds to go.", plugin.getDescription().getName(), config.varInterval - i));

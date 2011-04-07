@@ -139,7 +139,7 @@ public class AutoSave extends JavaPlugin {
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
 		
 		// Make an HTTP request for anonymous statistic collection
-		reportThread = new ReportThread(this, config);
+		reportThread = new ReportThread(this, config.varUuid, config.varDebug);
 		reportThread.start();
 		
 		// Notify on logger load
@@ -195,7 +195,7 @@ public class AutoSave extends JavaPlugin {
 		} else {
 			props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
 		}
-		props.setProperty("var.warntime", String.valueOf(config.varWarnTime));
+		props.setProperty("var.warntime", Generic.join(",", config.varWarnTimes));
 		props.setProperty("var.uuid", config.varUuid.toString());
 		props.setProperty("var.report", String.valueOf(config.varReport));
 		
@@ -258,7 +258,13 @@ public class AutoSave extends JavaPlugin {
 		
 		String tmpWorlds = props.getProperty("var.worlds", "*");
 		config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));
-		config.varWarnTime = Integer.parseInt(props.getProperty("var.warntime", String.valueOf(config.varWarnTime)));
+		
+		ArrayList<String> arrWarnTimes = new ArrayList<String>(Arrays.asList(props.getProperty("var.warntime", "0").split(",")));
+		config.varWarnTimes = new ArrayList<Integer>();
+		for(String s : arrWarnTimes) {
+			config.varWarnTimes.add(Integer.parseInt(s));
+		}
+		
 		String strUuid = props.getProperty("var.uuid", "");
 		try {
 			config.varUuid = UUID.fromString(strUuid);
@@ -453,14 +459,17 @@ public class AutoSave extends JavaPlugin {
         		
         		if(args.length == 1) {
         			// Report interval!
-        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnLookup.replaceAll("\\{%WARN%\\}", String.valueOf(config.varWarnTime))));
+        			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnLookup.replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes))));
         			return true;
         		} else if(args.length == 2) {
         			// Change interval!
         			try {
-        				int newWarnTime = Integer.parseInt(args[1]);
-        				config.varWarnTime = newWarnTime;
-        				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnChangeSuccess.replaceAll("\\{%WARN%\\}", String.valueOf(config.varWarnTime))));
+        				ArrayList<Integer> tmpWarn = new ArrayList<Integer>();
+        				for(String s: args[1].split(",")) {
+        					tmpWarn.add(Integer.parseInt(s));
+        				}
+        				config.varWarnTimes = tmpWarn;
+        				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnChangeSuccess.replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes))));
         				return true;
         			} catch(NumberFormatException e) {
         				sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageWarnNotANnumber));
@@ -538,7 +547,7 @@ public class AutoSave extends JavaPlugin {
     				boolean newSetting = false;
     				if(args[1].equalsIgnoreCase(config.valueOn)) {
     					if(reportThread == null || !reportThread.isAlive()) {
-    						reportThread = new ReportThread(this, config);
+    						reportThread = new ReportThread(this, config.varUuid, config.varDebug);
     						reportThread.start();
     					}
     					newSetting = true;
@@ -598,7 +607,7 @@ public class AutoSave extends JavaPlugin {
 					return false;
 				}
         		
-        		sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", pdfFile.getVersion())));
+        		sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", pdfFile.getVersion()).replaceAll("\\{%UUID%\\}", config.varUuid.toString())));
         		return true;
         	}
         } else {
