@@ -64,6 +64,8 @@ public class AutoSave extends JavaPlugin {
 	
 	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
 	static {
+		recommendedBuilds.put("git-Bukkit-0.0.0-612-g4c7a9e7-b617jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-612-g4c7a9e7-b617jnks (MC: 1.4)", true, 617, true));
+		recommendedBuilds.put("git-Bukkit-0.0.0-609-g39996e1-b612jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-609-g39996e1-b612jnks (MC: 1.4)", true, 612, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-544-g6c6c30a-b556jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-544-g6c6c30a-b556jnks (MC: 1.3)", true, 556, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-516-gdf87bb3-b531jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-516-gdf87bb3-b531jnks (MC: 1.3)", true, 531, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-512-g63bc855-b527jnks (MC: 1.3)", new BukkitVersion("git-Bukkit-0.0.0-512-g63bc855-b527jnks (MC: 1.3)", true, 527, true));
