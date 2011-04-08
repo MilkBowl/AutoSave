@@ -65,6 +65,7 @@ public class ReportThread extends Thread {
 									URLEncoder.encode(java, "ISO-8859-1")
 								));
 				URLConnection conn = statsUrl.openConnection();
+				conn.setRequestProperty("User-Agent", String.format("%s %s:%s", "BukkitReport", pluginName, pluginVersion));
 				String inputLine;
 				BufferedReader in = new BufferedReader(
 						new InputStreamReader(conn.getInputStream()));
