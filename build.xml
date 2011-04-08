@@ -21,7 +21,7 @@
   
     <target name="compile" description="Compilation target">
     	<echo>Compiling</echo>
-        <javac srcdir="." destdir="bin" classpathref="classpath" />
+        <javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
     	<copyfile dest="bin/plugin.yml" src="plugin.yml"/>
     </target>
   

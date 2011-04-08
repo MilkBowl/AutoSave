@@ -19,15 +19,23 @@ public class Generic {
     }
     
 	public static String join(String glue, List<?> s) {
-		int k = s.size();
-		if (k == 0) {
-			return null;
+		try {
+			if(s == null) {
+				return "";
+			}
+			
+			int k = s.size();
+			if (k == 0) {
+				return null;
+			}
+			StringBuilder out = new StringBuilder();
+			out.append(s.get(0).toString());
+			for (int x = 1; x < k; ++x) {
+				out.append(glue).append(s.get(x).toString());
+			}
+			return out.toString();
+		} catch (NullPointerException npe) {
+			return "";
 		}
-		StringBuilder out = new StringBuilder();
-		out.append(s.get(0).toString());
-		for (int x = 1; x < k; ++x) {
-			out.append(glue).append(s.get(x).toString());
-		}
-		return out.toString();
 	}
 }

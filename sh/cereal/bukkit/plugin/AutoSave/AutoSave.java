@@ -24,6 +24,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,7 +143,7 @@ public class AutoSave extends JavaPlugin {
 		reportThread.start();
 		
 		// Notify on logger load
-		log.info(String.format("[%s] Version %s is enabled!", pdfFile.getName(), pdfFile.getVersion()));
+		log.info(String.format("[%s] Version %s is enabled: %s", pdfFile.getName(), pdfFile.getVersion(), config.varUuid.toString()));
 	}
 	
 	public void obtainPermissions() {
@@ -162,50 +164,54 @@ public class AutoSave extends JavaPlugin {
 	}
 	
 	public void writeConfigFile() {
-		// Log config
-		if(config.varDebug) {
-			logObject(config);
-		}
-		
-		// Write properties file
-		log.info(String.format("[%s] Saving config file", pdfFile.getName()));
-		Properties props = new Properties();
-		
-		// Messages
-		props.setProperty("message.broadcastpre", config.messageBroadcastPre);
-		props.setProperty("message.broadcastpost", config.messageBroadcastPost);
-		props.setProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
-		props.setProperty("message.saveworlds", config.messageSaveWorlds);
-		props.setProperty("message.saveplayers", config.messageSavePlayers);
-		props.setProperty("message.warning", config.messageWarning);
-		
-		// Values
-		props.setProperty("value.on", config.valueOn);
-		props.setProperty("value.off", config.valueOff);
-		
-		// Variables
-		props.setProperty("var.debug", String.valueOf(config.varDebug));
-		props.setProperty("var.interval", String.valueOf(config.varInterval));
-		props.setProperty("var.permissions", String.valueOf(config.varPermissions));
-		props.setProperty("var.broadcast", String.valueOf(config.varBroadcast));
-		if(config.varWorlds == null) {
-			props.setProperty("var.worlds", "*");
-		} else {
-			props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
-		}
-		props.setProperty("var.warntime", Generic.join(",", config.varWarnTimes));
-		props.setProperty("var.uuid", config.varUuid.toString());
-		props.setProperty("var.report", String.valueOf(config.varReport));
-		
-		try {
-			props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
-		} catch (FileNotFoundException e) {
-			// Shouldn't happen...report and continue
-			log.info(String.format("[%s] FileNotFoundException while saving config file", pdfFile.getName()));
-		} catch (IOException e) {
-			// Report and continue
-			log.info(String.format("[%s] IOException while saving config file", pdfFile.getName()));
-		}		
+			// Log config
+			if (config.varDebug) {
+				logObject(config);
+			}
+
+			// Write properties file
+			log.info(String.format("[%s] Saving config file", pdfFile.getName()));
+			Properties props = new Properties();
+
+			// Messages
+			props.setProperty("message.broadcastpre", config.messageBroadcastPre);
+			props.setProperty("message.broadcastpost", config.messageBroadcastPost);
+			props.setProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
+			props.setProperty("message.saveworlds", config.messageSaveWorlds);
+			props.setProperty("message.saveplayers", config.messageSavePlayers);
+			props.setProperty("message.warning", config.messageWarning);
+
+			// Values
+			props.setProperty("value.on", config.valueOn);
+			props.setProperty("value.off", config.valueOff);
+
+			// Variables
+			props.setProperty("var.debug", String.valueOf(config.varDebug));
+			props.setProperty("var.interval", String.valueOf(config.varInterval));
+			props.setProperty("var.permissions", String.valueOf(config.varPermissions));
+			props.setProperty("var.broadcast", String.valueOf(config.varBroadcast));
+			if (config.varWorlds == null) {
+				props.setProperty("var.worlds", "*");
+			} else {
+				props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
+			}
+			props.setProperty("var.warntime", Generic.join(",", config.varWarnTimes));
+			
+			if(config.varUuid == null) {
+				config.varUuid = UUID.randomUUID();
+			}
+			props.setProperty("var.uuid", config.varUuid.toString());
+			props.setProperty("var.report", String.valueOf(config.varReport));
+
+			try {
+				props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
+			} catch (FileNotFoundException e) {
+				// Shouldn't happen...report and continue
+				log.info(String.format("[%s] FileNotFoundException while saving config file", pdfFile.getName()));
+			} catch (IOException e) {
+				// Report and continue
+				log.info(String.format("[%s] IOException while saving config file", pdfFile.getName()));
+			}
 	}
 	
 	public void loadConfigFile() {
@@ -257,10 +263,15 @@ public class AutoSave extends JavaPlugin {
 		String tmpWorlds = props.getProperty("var.worlds", "*");
 		config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));
 		
-		ArrayList<String> arrWarnTimes = new ArrayList<String>(Arrays.asList(props.getProperty("var.warntime", "0").split(",")));
-		config.varWarnTimes = new ArrayList<Integer>();
+		String[] arrWarnTimes = props.getProperty("var.warntime", "0").split(",");
+		config.varWarnTimes = new ArrayList<Integer>();		
 		for(String s : arrWarnTimes) {
-			config.varWarnTimes.add(Integer.parseInt(s));
+			if(!s.equals("")) {
+				config.varWarnTimes.add(Integer.parseInt(s));
+			}
+		}
+		if(config.varWarnTimes.size() == 0) {
+			config.varWarnTimes.add(0);
 		}
 		
 		String strUuid = props.getProperty("var.uuid", "");
