@@ -9,8 +9,13 @@ public class AutoSavePlayerListener extends PlayerListener {
 	private AutoSave plugin = null;
 	private int players = 0;
 	
-	public AutoSavePlayerListener(AutoSave plugin) {
+	public AutoSavePlayerListener(AutoSave plugin, int playerCount) {
 		this.plugin = plugin;
+		this.players = playerCount;
+		
+		if(players > 0) {
+			plugin.startSaveThread();
+		}
 	}
 	
 	public void onPlayerJoin(PlayerJoinEvent event) {

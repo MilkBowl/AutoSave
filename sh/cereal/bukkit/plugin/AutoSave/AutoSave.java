@@ -66,6 +66,7 @@ public class AutoSave extends JavaPlugin {
 	
 	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
 	static {
+		recommendedBuilds.put("git-Bukkit-0.0.0-653-g9992fff-b677jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-653-g9992fff-b677jnks (MC: 1.4)", true, 677, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-650-g18123d3-b674jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-650-g18123d3-b674jnks (MC: 1.4)", true, 674, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-646-gb61ef8c-b670jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-646-gb61ef8c-b670jnks (MC: 1.4)", true, 670, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-645-g28db978-b669jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-645-g28db978-b669jnks (MC: 1.4)", true, 669, true));
@@ -134,7 +135,7 @@ public class AutoSave extends JavaPlugin {
 		}
 		
 		// Register Events -- WEEE
-		playerListener = new AutoSavePlayerListener(this);
+		playerListener = new AutoSavePlayerListener(this, getServer().getOnlinePlayers().length);
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
