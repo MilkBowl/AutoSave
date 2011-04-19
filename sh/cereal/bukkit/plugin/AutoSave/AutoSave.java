@@ -35,6 +35,7 @@ import java.util.InvalidPropertiesFormatException;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -66,6 +67,7 @@ public class AutoSave extends JavaPlugin {
 	
 	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
 	static {
+	    	recommendedBuilds.put("git-Bukkit-0.0.0-659-gc210f22-b684jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-659-gc210f22-b684jnks (MC: 1.4)", true, 684, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-653-g9992fff-b677jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-653-g9992fff-b677jnks (MC: 1.4)", true, 677, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-650-g18123d3-b674jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-650-g18123d3-b674jnks (MC: 1.4)", true, 674, true));
 		recommendedBuilds.put("git-Bukkit-0.0.0-646-gb61ef8c-b670jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-646-gb61ef8c-b670jnks (MC: 1.4)", true, 670, true));
@@ -74,16 +76,34 @@ public class AutoSave extends JavaPlugin {
 		recommendedBuilds.put("git-Bukkit-0.0.0-609-g39996e1-b612jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-609-g39996e1-b612jnks (MC: 1.4)", true, 612, true));
 	}
 
-	@Override
-	public void onDisable() {
-		// Stop thread
-		stopSaveThread();
-		
-		// Write Config File
-		writeConfigFile();
-		
-		log.info(String.format("[%s] Version %s is disabled!", pdfFile.getName(), pdfFile.getVersion()));
+    @Override
+    public void onDisable() {
+	long timeA = 0;
+	if (config.varDebug) {
+	    timeA = System.currentTimeMillis();
 	}
+	// Stop thread
+	if(config.varDebug) {
+	    log.info(String.format("[%s] Stopping Save Thread", pdfFile.getName()));
+	}
+	stopSaveThread();
+
+	// Write Config File
+	if(config.varDebug) {
+	    log.info(String.format("[%s] Write Config File", pdfFile.getName()));
+	}
+	writeConfigFile();
+	
+	if (config.varDebug) {
+	    long timeB = System.currentTimeMillis();
+	    long millis = timeB - timeA;
+	    long durationSeconds = TimeUnit.MILLISECONDS.toSeconds(millis);
+	    
+	    log.info(String.format("[%s] Version %s was disabled in %d seconds", pdfFile.getName(), pdfFile.getVersion(), durationSeconds));
+	} else {
+	    log.info(String.format("[%s] Version %s is disabled!", pdfFile.getName(), pdfFile.getVersion()));
+	}
+    }
 
 	@Override
 	public void onEnable() {		
