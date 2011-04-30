@@ -63,6 +63,7 @@ public class AutoSave extends JavaPlugin {
 	private ReportThread reportThread = null;
 	private AutoSaveConfig config = new AutoSaveConfig();
 	private AutoSavePlayerListener playerListener = null;
+	protected Date lastSave = null;
 	protected int numPlayers = 0;
 	
 	private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
@@ -139,7 +140,7 @@ public class AutoSave extends JavaPlugin {
 			// Check World
 			Class<?> w = Class.forName("org.bukkit.World");
 			w.getMethod("save", new Class[] {});
-		} catch(ClassNotFoundException e) {
+		} catch(ClassNotFoundException e) {   
 			// Do error stuff
 			log.severe(String.format("[%s] ERROR: Server version is incompatible with %s!", pdfFile.getName(), pdfFile.getName()));
 			log.severe(String.format("[%s] Could not find class \"%s\", disabling!", pdfFile.getName(), e.getMessage()));
@@ -162,6 +163,7 @@ public class AutoSave extends JavaPlugin {
 		PluginManager pm = getServer().getPluginManager();
 		pm.registerEvent(Event.Type.PLAYER_JOIN, playerListener, Priority.Monitor, this);
 		pm.registerEvent(Event.Type.PLAYER_QUIT, playerListener, Priority.Monitor, this);
+		pm.registerEvent(Event.Type.PLAYER_KICK, playerListener, Priority.Monitor, this);
 		
 		// Make an HTTP request for anonymous statistic collection
 		reportThread = new ReportThread(this, config.varUuid, config.varDebug);
@@ -446,12 +448,11 @@ public class AutoSave extends JavaPlugin {
         			sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusOff));
         		} else {
             		if(saveThread.isAlive()) {
-            			Date lastSaved = saveThread.getLastSave();
-            			if(lastSaved == null) {
+            			if(lastSave == null) {
             				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusNotRun));
             				return true;
             			} else {
-            				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusSuccess.replaceAll("\\{%DATE%\\}", lastSaved.toString())));
+            				sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusSuccess.replaceAll("\\{%DATE%\\}", lastSave.toString())));
             				return true;
             			}
             		} else {
@@ -711,6 +712,36 @@ public class AutoSave extends JavaPlugin {
     	}
     	return i;
     	//return CommandHelper.queueConsoleCommand(getServer(), "save-all");
+    }
+    
+    public void performSave() {
+        if(config.varBroadcast && !config.messageBroadcastPre.equals("")) {
+            getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastPre));
+            log.info(String.format("[%s] %s", getDescription().getName(), config.messageBroadcastPre));
+        }                   
+
+        // Save the players
+        savePlayers();
+        if(config.varDebug) {
+            log.info(String.format("[%s] Saved Players", getDescription().getName()));
+        }
+
+        // Save the worlds
+        int saved = 0;
+        if(config.varWorlds.contains("*")) {
+            saved += saveWorlds();
+        } else {
+            saved += saveWorlds(config.varWorlds);
+        }
+        if(config.varDebug) {
+            log.info(String.format("[%s] Saved %d Worlds", getDescription().getName(), saved));
+        }
+        
+        lastSave = new Date();
+        if(config.varBroadcast && !config.messageBroadcastPost.equals("")) {
+            getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastPost));
+            log.info(String.format("[%s] %s", getDescription().getName(), config.messageBroadcastPost));
+        }        
     }
 	
 }

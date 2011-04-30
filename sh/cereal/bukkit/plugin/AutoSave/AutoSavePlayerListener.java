@@ -1,6 +1,7 @@
 package sh.cereal.bukkit.plugin.AutoSave;
 
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
 import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.player.PlayerQuitEvent;
 
@@ -31,6 +32,16 @@ public class AutoSavePlayerListener extends PlayerListener {
 		
 		if(players == 0) {
 			plugin.stopSaveThread();
+	                plugin.performSave();			
 		}
+	}
+	
+	public void onPlayerKick(PlayerKickEvent event) {
+	    players--;
+	    
+	    if(players == 0) {
+	        plugin.stopSaveThread();
+	        plugin.performSave();
+	    }
 	}
 }
