@@ -1,10 +1,10 @@
 package net.milkbowl.vault.v0.modules.permission;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import net.milkbowl.vault.v0.modules.permission.plugins.Permission_None;
 import net.milkbowl.vault.v0.modules.permission.plugins.Permission_Permissions;
 import net.milkbowl.vault.v0.modules.permission.plugins.Permission_PermissionsEx;
 
@@ -21,6 +21,23 @@ public class PermissionManager {
 
     public PermissionManager(JavaPlugin plugin) {
         this.plugin = plugin;
+    }
+    
+    public boolean load(Map<String, Permission> permissions) {
+        // Try to load Provided Permissions
+        Iterator<String> it = permissions.keySet().iterator();
+        while(it.hasNext()) {
+            String key = it.next();
+            Permission value = permissions.get(key);
+            perms.put(10, value);
+            log.info(String.format("[%s][Permission] Custom Permissions \"%s\" found: %s", plugin.getDescription().getName(), key, value.isEnabled() ? "Loaded" : "Waiting"));
+        }
+        
+        if(load() & perms.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
     
     public boolean load() {
@@ -41,13 +58,6 @@ public class PermissionManager {
             log.info(String.format("[%s][Permission] Permissions (Phoenix) found: %s", plugin.getDescription().getName(), nPerms.isEnabled() ? "Loaded" : "Waiting"));
         } else {
             log.info(String.format("[%s][Permission] Permissions (Phoenix) not found.", plugin.getDescription().getName()));
-        }
-        
-        // Try to load Local Fallback Permissions (aka None)
-        {
-            Permission lPerms = new Permission_None();
-            perms.put(10, lPerms);
-            log.info(String.format("[%s][Permission] Local Fallback Permissions found: %s", plugin.getDescription().getName(), lPerms.isEnabled() ? "Loaded" : "Waiting"));
         }
         
         if(perms.size() > 0) {

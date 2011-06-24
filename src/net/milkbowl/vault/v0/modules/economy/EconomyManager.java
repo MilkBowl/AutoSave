@@ -1,6 +1,7 @@
 package net.milkbowl.vault.v0.modules.economy;
 
 import java.util.Iterator;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
@@ -8,6 +9,7 @@ import net.milkbowl.vault.v0.modules.economy.plugins.Economy_BOSE;
 import net.milkbowl.vault.v0.modules.economy.plugins.Economy_Essentials;
 import net.milkbowl.vault.v0.modules.economy.plugins.Economy_iConomy4;
 import net.milkbowl.vault.v0.modules.economy.plugins.Economy_iConomy5;
+import net.milkbowl.vault.v0.modules.permission.Permission;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -21,8 +23,25 @@ public class EconomyManager {
     public EconomyManager(JavaPlugin plugin) {
         this.plugin = plugin;
     }
+    
+    public boolean load(Map<String, Economy> economies) {
+        // Try to load Provided Permissions
+        Iterator<String> it = economies.keySet().iterator();
+        while(it.hasNext()) {
+            String key = it.next();
+            Economy value = economies.get(key);
+            econs.put(10, value);
+            log.info(String.format("[%s][Permission] Custom Economy \"%s\" found: %s", plugin.getDescription().getName(), key, value.isEnabled() ? "Loaded" : "Waiting"));
+        }
+        
+        if(load() & econs.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    public boolean loadEconomies() {
+    public boolean load() {
         // Try to load BOSEconomy
         if (packageExists(new String[] { "cosine.boseconomy.BOSEconomy" })) {
             Economy bose = new Economy_BOSE(plugin);
