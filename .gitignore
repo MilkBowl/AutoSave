@@ -1,1 +1,6 @@
 lib
+.classpath
+.externalToolBuilders
+.project
+.settings
+AutoSave.jar
