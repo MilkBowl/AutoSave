@@ -1,0 +1,9 @@
+# Eclipse stuff
+/.classpath
+/.project
+/.settings
+/META-INF
+/src/lib
+/src/Vault.jar
+/bin
+.externalToolBuilders
