@@ -68,8 +68,8 @@ public class AutoSaveThread extends Thread {
                         if (config.varDebug) {
                             log.info(String.format("[%s] Warning Time Reached: %d seconds to go.", plugin.getDescription().getName(), config.varInterval - i));
                         }
-                        plugin.getServer().broadcastMessage(config.messageWarning);
-                        log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.messageWarning));
+                        plugin.getServer().broadcastMessage(config.getMessageWarning());
+                        log.info(String.format("[%s] %s", plugin.getDescription().getName(), config.getMessageWarning()));
                     }
                     Thread.sleep(1000);
                 } catch (InterruptedException e) {

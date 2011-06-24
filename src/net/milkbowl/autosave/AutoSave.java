@@ -270,15 +270,15 @@ public class AutoSave extends JavaPlugin {
          */
 
         // Messages
-        config.messageBroadcastPre = props.getProperty("message.broadcastpre", config.messageBroadcastPre);
-        config.messageBroadcastPost = props.getProperty("message.broadcastpost", config.messageBroadcastPost);
-        config.messageInsufficientPermissions = props.getProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
-        config.messageSaveWorlds = props.getProperty("message.saveworlds", config.messageSaveWorlds);
-        config.messageSavePlayers = props.getProperty("message.saveplayers", config.messageSavePlayers);
-        config.messageDebugChangeSuccess = props.getProperty("message.debugchangesuccess", config.messageDebugChangeSuccess);
-        config.messageDebugLookup = props.getProperty("message.debuglookup", config.messageDebugLookup);
-        config.messageDebugNotValid = props.getProperty("message.debugnotvalue", config.messageDebugNotValid);
-        config.messageWarning = props.getProperty("message.warning", config.messageWarning);
+        config.setMessageBroadcastPre( props.getProperty("message.broadcastpre", config.messageBroadcastPre) );
+        config.setMessageBroadcastPost( props.getProperty("message.broadcastpost", config.messageBroadcastPost) );
+        config.setMessageInsufficientPermissions( props.getProperty("message.insufficentpermissions", config.messageInsufficientPermissions) );
+        config.setMessageSaveWorlds( props.getProperty("message.saveworlds", config.messageSaveWorlds) );
+        config.setMessageSavePlayers( props.getProperty("message.saveplayers", config.messageSavePlayers) );
+        config.setMessageDebugChangeSuccess( props.getProperty("message.debugchangesuccess", config.messageDebugChangeSuccess) );
+        config.setMessageDebugLookup( props.getProperty("message.debuglookup", config.messageDebugLookup) );
+        config.setMessageDebugNotValid( props.getProperty("message.debugnotvalue", config.messageDebugNotValid) );
+        config.setMessageWarning( props.getProperty("message.warning", config.messageWarning) );
 
         // Values
         config.valueOn = props.getProperty("value.on", config.valueOn);
@@ -361,17 +361,17 @@ public class AutoSave extends JavaPlugin {
                 // Check Permissions
                 if (!checkPermissions("autosave.save", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 // Perform save
                 // Players
                 savePlayers();
-                sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageSavePlayers));
+                sender.sendMessage(config.getMessageSavePlayers());
                 // Worlds
                 int worlds = saveWorlds();
-                sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageSaveWorlds.replaceAll("\\{%NUMSAVED%\\}", String.valueOf(worlds))));
+                sender.sendMessage(config.getMessageSaveWorlds().replaceAll("\\{%NUMSAVED%\\}", String.valueOf(worlds)));
                 if (worlds > 0) {
                     return true;
                 } else {
@@ -425,40 +425,40 @@ public class AutoSave extends JavaPlugin {
                 // Check Permissions
                 if (!checkPermissions("autosave.toggle", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 // Start thread
                 if (saveThread == null) {
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStarting));
+                    sender.sendMessage(config.getMessageStarting());
                     return startSaveThread();
                 } else { // Stop thread
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStopping));
+                    sender.sendMessage(config.getMessageStopping());
                     return stopSaveThread();
                 }
             } else if (args.length == 1 && args[0].equalsIgnoreCase("status")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.status", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 // Get Thread Status
                 if (saveThread == null) {
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusOff));
+                    sender.sendMessage(config.getMessageStatusOff());
                 } else {
                     if (saveThread.isAlive()) {
                         if (lastSave == null) {
-                            sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusNotRun));
+                            sender.sendMessage(config.getMessageStatusNotRun());
                             return true;
                         } else {
-                            sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusSuccess.replaceAll("\\{%DATE%\\}", lastSave.toString())));
+                            sender.sendMessage(config.getMessageStatusSuccess().replaceAll("\\{%DATE%\\}", lastSave.toString()));
                             return true;
                         }
                     } else {
-                        sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageStatusFail));
+                        sender.sendMessage(config.getMessageStatusFail());
                         return true;
                     }
                 }
@@ -466,23 +466,23 @@ public class AutoSave extends JavaPlugin {
                 // Check Permissions
                 if (!checkPermissions("autosave.interval", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 if (args.length == 1) {
                     // Report interval!
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageIntervalLookup.replaceAll("\\{%INTERVAL%\\}", String.valueOf(config.varInterval))));
+                    sender.sendMessage(config.getMessageIntervalLookup().replaceAll("\\{%INTERVAL%\\}", String.valueOf(config.varInterval)));
                     return true;
                 } else if (args.length == 2) {
                     // Change interval!
                     try {
                         int newInterval = Integer.parseInt(args[1]);
                         config.varInterval = newInterval;
-                        sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageIntervalChangeSuccess.replaceAll("\\{%INTERVAL%\\}", String.valueOf(config.varInterval))));
+                        sender.sendMessage(config.getMessageIntervalChangeSuccess().replaceAll("\\{%INTERVAL%\\}", String.valueOf(config.varInterval)));
                         return true;
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageIntervalNotANnumber));
+                        sender.sendMessage(config.getMessageIntervalNotANnumber());
                         return false;
                     }
                 }
@@ -490,13 +490,13 @@ public class AutoSave extends JavaPlugin {
                 // Check Permissions
                 if (!checkPermissions("autosave.warn", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 if (args.length == 1) {
                     // Report interval!
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnLookup.replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes))));
+                    sender.sendMessage(config.getMessageWarnLookup().replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes)));
                     return true;
                 } else if (args.length == 2) {
                     // Change interval!
@@ -506,10 +506,10 @@ public class AutoSave extends JavaPlugin {
                             tmpWarn.add(Integer.parseInt(s));
                         }
                         config.varWarnTimes = tmpWarn;
-                        sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageWarnChangeSuccess.replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes))));
+                        sender.sendMessage(config.getMessageWarnChangeSuccess().replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes)));
                         return true;
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageWarnNotANnumber));
+                        sender.sendMessage(config.getMessageWarnNotANnumber());
                         return false;
                     }
                 }
@@ -517,13 +517,13 @@ public class AutoSave extends JavaPlugin {
                 // Check Permissions
                 if (!checkPermissions("autosave.broadcast", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 if (args.length == 1) {
                     // Report broadcast status!
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastLookup.replaceAll("\\{%BROADCAST%\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff))));
+                    sender.sendMessage(config.getMessageBroadcastLookup().replaceAll("\\{%BROADCAST%\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change broadcast status!
@@ -533,24 +533,24 @@ public class AutoSave extends JavaPlugin {
                     } else if (args[1].equalsIgnoreCase(config.valueOff)) {
                         newSetting = false;
                     } else {
-                        sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageBroadcastNotValid.replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff)));
+                        sender.sendMessage(config.getMessageBroadcastNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
                         return false;
                     }
                     config.varBroadcast = newSetting;
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastChangeSuccess.replaceAll("\\{%BROADCAST%\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff))));
+                    sender.sendMessage(config.getMessageBroadcastChangeSuccess().replaceAll("\\{%BROADCAST%\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
                     return true;
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("debug")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.debug", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 if (args.length == 1) {
                     // Report debug status!
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageDebugLookup.replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff))));
+                    sender.sendMessage(config.getMessageDebugLookup().replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change debug status!
@@ -560,24 +560,24 @@ public class AutoSave extends JavaPlugin {
                     } else if (args[1].equalsIgnoreCase(config.valueOff)) {
                         newSetting = false;
                     } else {
-                        sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageDebugNotValid.replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff)));
+                        sender.sendMessage(config.getMessageDebugNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
                         return false;
                     }
                     config.varDebug = newSetting;
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageDebugChangeSuccess.replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff))));
+                    sender.sendMessage(config.getMessageDebugChangeSuccess().replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
                     return true;
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("report")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.report", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 if (args.length == 1) {
                     // Report report status!
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageReportLookup.replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff))));
+                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.getMessageReportLookup().replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff))));
                     return true;
                 } else if (args.length == 2) {
                     // Change report status!
@@ -594,57 +594,57 @@ public class AutoSave extends JavaPlugin {
                         }
                         newSetting = false;
                     } else {
-                        sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageReportNotValid.replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff)));
+                        sender.sendMessage(config.getMessageReportNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
                         return false;
                     }
                     config.varReport = newSetting;
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageReportChangeSuccess.replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff))));
+                    sender.sendMessage(config.getMessageReportChangeSuccess().replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff)));
                     return true;
                 }
             } else if (args.length == 2 && args[0].equalsIgnoreCase("addworld")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.world.add", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 config.varWorlds.add(args[1]);
-                sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
+                sender.sendMessage(config.getMessageWorldChangeSuccess().replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
 
                 return true;
             } else if (args.length == 2 && args[0].equalsIgnoreCase("remworld")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.world.rem", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
                 config.varWorlds.remove(args[1]);
-                sender.sendMessage(config.messageWorldChangeSuccess.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
+                sender.sendMessage(config.getMessageWorldChangeSuccess().replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
 
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("world")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.world", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
-                sender.sendMessage(config.messageWorldLookup.replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
+                sender.sendMessage(config.getMessageWorldLookup().replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
 
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("version")) {
                 // Check Permissions
                 if (!checkPermissions("autosave.version", player)) {
                     // Permission check failed!
-                    sender.sendMessage(String.format("%s%s", ChatColor.RED, config.messageInsufficientPermissions));
+                    sender.sendMessage(config.getMessageInsufficientPermissions());
                     return false;
                 }
 
-                sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", pdfFile.getVersion()).replaceAll("\\{%UUID%\\}", config.varUuid.toString())));
+                sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.getMessageVersion().replaceAll("\\{%VERSION%\\}", pdfFile.getVersion()).replaceAll("\\{%UUID%\\}", config.varUuid.toString())));
                 return true;
             }
         } else {
@@ -717,9 +717,9 @@ public class AutoSave extends JavaPlugin {
     }
 
     public void performSave() {
-        if (config.varBroadcast && !config.messageBroadcastPre.equals("")) {
-            getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastPre));
-            log.info(String.format("[%s] %s", getDescription().getName(), config.messageBroadcastPre));
+        if (config.varBroadcast && !config.getMessageBroadcastPre().equals("")) {
+            getServer().broadcastMessage(config.getMessageBroadcastPre());
+            log.info(String.format("[%s] %s", getDescription().getName(), config.getMessageBroadcastPre()));
         }
 
         // Save the players
@@ -740,9 +740,9 @@ public class AutoSave extends JavaPlugin {
         }
 
         lastSave = new Date();
-        if (config.varBroadcast && !config.messageBroadcastPost.equals("")) {
-            getServer().broadcastMessage(String.format("%s%s", ChatColor.BLUE, config.messageBroadcastPost));
-            log.info(String.format("[%s] %s", getDescription().getName(), config.messageBroadcastPost));
+        if (config.varBroadcast && !config.getMessageBroadcastPost().equals("")) {
+            getServer().broadcastMessage(config.getMessageBroadcastPost());
+            log.info(String.format("[%s] %s", getDescription().getName(), config.getMessageBroadcastPost()));
         }
     }
 
