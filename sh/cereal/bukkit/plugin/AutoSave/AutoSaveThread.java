@@ -21,8 +21,6 @@ package sh.cereal.bukkit.plugin.AutoSave;
 import java.util.Date;
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
-
 public class AutoSaveThread extends Thread {
 
     protected final Logger log = Logger.getLogger("Minecraft");
@@ -82,7 +80,7 @@ public class AutoSaveThread extends Thread {
             // getServer().savePlayers() & World.save() are not listed as
             // explicitly threadsafe. Note; getServer().getWorlds() isn't
             // threadsafe either.
-            plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
+            plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
 
                 public void run() {
                     plugin.performSave();
