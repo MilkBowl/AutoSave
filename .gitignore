@@ -3,7 +3,7 @@
 /.project
 /.settings
 /META-INF
-/src/lib
-/src/Vault.jar
+/lib
+/Vault.jar
 /bin
 .externalToolBuilders
