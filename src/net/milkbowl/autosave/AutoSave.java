@@ -65,20 +65,6 @@ public class AutoSave extends JavaPlugin {
     protected Date lastSave = null;
     protected int numPlayers = 0;
     private PermissionManager permManager = null;
-
-    private static HashMap<String, BukkitVersion> recommendedBuilds = new HashMap<String, BukkitVersion>();
-    static {
-        recommendedBuilds.put("git-Bukkit-0.0.0-706-gf53e007-b740jnks (MC: 1.5_02)", new BukkitVersion("git-Bukkit-0.0.0-706-gf53e007-b740jnks (MC: 1.5_02)", true, 740, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-705-g3d3f495-b739jnks (MC: 1.5_02)", new BukkitVersion("git-Bukkit-0.0.0-705-g3d3f495-b739jnks (MC: 1.5_02)", true, 739, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-700-gf3ae4c3-b733jnks (MC: 1.5_02)", new BukkitVersion("git-Bukkit-0.0.0-700-gf3ae4c3-b733jnks (MC: 1.5_02)", true, 733, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-659-gc210f22-b684jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-659-gc210f22-b684jnks (MC: 1.4)", true, 684, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-653-g9992fff-b677jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-653-g9992fff-b677jnks (MC: 1.4)", true, 677, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-650-g18123d3-b674jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-650-g18123d3-b674jnks (MC: 1.4)", true, 674, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-646-gb61ef8c-b670jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-646-gb61ef8c-b670jnks (MC: 1.4)", true, 670, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-645-g28db978-b669jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-645-g28db978-b669jnks (MC: 1.4)", true, 669, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-612-g4c7a9e7-b617jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-612-g4c7a9e7-b617jnks (MC: 1.4)", true, 617, true));
-        recommendedBuilds.put("git-Bukkit-0.0.0-609-g39996e1-b612jnks (MC: 1.4)", new BukkitVersion("git-Bukkit-0.0.0-609-g39996e1-b612jnks (MC: 1.4)", true, 612, true));
-    }
     
     public AutoSave() {
         String[] jars = new String[] { "Vault-0.jar" };
@@ -137,16 +123,6 @@ public class AutoSave extends JavaPlugin {
     public void onEnable() {
         // Get Plugin Info
         pdfFile = this.getDescription();
-
-        // Check Server Version String
-        if (recommendedBuilds.containsKey(getServer().getVersion())) {
-            // Known Build
-            BukkitVersion ver = recommendedBuilds.get(getServer().getVersion());
-            log.info(String.format("[%s] Server Version is %s%d", pdfFile.getName(), ver.recommendedBuild ? "Recommended Build " : "Build ", ver.buildNumber, ver.supported ? "is supported" : "is NOT supported"));
-        } else {
-            // Unknown Build -- Warn
-            log.warning(String.format("[%s] UNKNOWN SERVER VERSION: It has NOT been tested and %s MAY NOT function properly: %s", pdfFile.getName(), pdfFile.getName(), getServer().getVersion()));
-        }
 
         // Ensure our folder exists...
         File dir = new File("plugins/AutoSave");
