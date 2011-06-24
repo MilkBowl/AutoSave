@@ -1,4 +1,4 @@
-package sh.cereal.bukkit.plugin.AutoSave;
+package net.milkbowl.autosave;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

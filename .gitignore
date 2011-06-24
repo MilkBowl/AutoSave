@@ -3,4 +3,5 @@ lib
 .externalToolBuilders
 .project
 .settings
+bin
 AutoSave.jar

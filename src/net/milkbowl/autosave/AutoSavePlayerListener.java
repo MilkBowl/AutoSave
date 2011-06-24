@@ -1,4 +1,4 @@
-package sh.cereal.bukkit.plugin.AutoSave;
+package net.milkbowl.autosave;
 
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerKickEvent;

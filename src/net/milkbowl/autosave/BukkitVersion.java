@@ -1,4 +1,4 @@
-package sh.cereal.bukkit.plugin.AutoSave;
+package net.milkbowl.autosave;
 
 public class BukkitVersion {
 	public String version = "";

@@ -16,7 +16,7 @@
  *
  */
 
-package sh.cereal.bukkit.plugin.AutoSave;
+package net.milkbowl.autosave;
 
 import java.util.ArrayList;
 import java.util.UUID;

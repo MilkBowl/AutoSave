@@ -19,7 +19,7 @@
  *
  */
 
-package sh.cereal.bukkit.plugin.AutoSave;
+package net.milkbowl.autosave;
 
 import java.lang.reflect.Field;
 import java.util.logging.Logger;

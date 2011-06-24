@@ -16,7 +16,7 @@
  *
  */
 
-package sh.cereal.bukkit.plugin.AutoSave;
+package net.milkbowl.autosave;
 
 import java.util.Date;
 import java.util.logging.Logger;
