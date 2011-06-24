@@ -22,11 +22,14 @@
     	<echo>Compiling</echo>
         <javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
     	<copy file="plugin.yml" tofile="bin/plugin.yml"/>
+    	<copy todir="bin/jars">
+    		<fileset dir="src/jars" />
+    	</copy>
     </target>
   
   <target name="compress" description="Compression target">
-  		<echo>Compressing</echo>
-        <jar jarfile="AutoSave.jar" basedir="bin" includes="sh/**/*, plugin.yml">
+  	<echo>Compressing</echo>
+        <jar jarfile="AutoSave.jar" basedir="bin" includes="net/**/*, jars/**/*, plugin.yml">
         	<manifest>
         		<attribute name="Built-By" value="${user.name}" />
         		<attribute name="Class-Path" value="../lib/Vault-0.jar"/>
