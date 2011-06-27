@@ -2,7 +2,6 @@
 <project default="main">
     <path id="classpath">
         <fileset dir="lib" includes="**/*.jar"/>
-        <fileset dir="src/jars" includes="**/*.jar"/>
     </path>
 	
     <target name="main" depends="clean, compile, compress" description="Main target">
@@ -22,17 +21,13 @@
     	<echo>Compiling</echo>
         <javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
     	<copy file="plugin.yml" tofile="bin/plugin.yml"/>
-    	<copy todir="bin/jars">
-    		<fileset dir="src/jars" />
-    	</copy>
     </target>
   
   <target name="compress" description="Compression target">
   	<echo>Compressing</echo>
-        <jar jarfile="AutoSave.jar" basedir="bin" includes="net/**/*, jars/**/*, plugin.yml">
+        <jar jarfile="AutoSave.jar" basedir="bin" includes="net/**/*, plugin.yml">
         	<manifest>
         		<attribute name="Built-By" value="${user.name}" />
-        		<attribute name="Class-Path" value="../lib/Vault-0.jar"/>
         	</manifest>
         </jar>
     	<delete dir="bin" />
