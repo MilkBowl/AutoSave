@@ -1,6 +1,6 @@
 name: AutoSave
 main: net.milkbowl.autosave.AutoSave
-version: 2.0.0
+version: 2.0.1
 author: Morgan Humes aka Cereal, Xon
 description: >
              Provides automatic world saves at defined intervals.  The focus

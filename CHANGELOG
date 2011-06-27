@@ -1,3 +1,14 @@
+Version 2.0.1
+    * Small library changes
+
+Version 2.0.0
+    * Color Messages support!
+    * Multiple Permissions Support!
+          o PermissionsEx
+          o Permissions
+    * No version nagging!
+    * ASync Tasks instead of Sync Tasks (possible performance increase)
+
 Version 1.1.5
     * Implemented a configurable warning message!
           o See configuration file for "config.messagewarn" and command "save warn"
