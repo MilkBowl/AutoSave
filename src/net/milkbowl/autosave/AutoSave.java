@@ -65,30 +65,6 @@ public class AutoSave extends JavaPlugin {
     protected Date lastSave = null;
     protected int numPlayers = 0;
     private PermissionManager permManager = null;
-    
-    public AutoSave() {
-        String[] jars = new String[] { "Vault-0.jar" };
-
-        for (String jar : jars) {
-            try {
-                File f = new File("lib/" + jar);
-                if (!f.exists()) {
-                    log.info(String.format("[AutoSave] Extracting Library %s", jar));
-                    InputStream inputStream = this.getClass().getResourceAsStream("/jars/" + jar);
-                    OutputStream out = new FileOutputStream(f);
-                    byte buf[] = new byte[1024];
-                    int len;
-                    while ((len = inputStream.read(buf)) > 0) {
-                        out.write(buf, 0, len);
-                    }
-                    out.close();
-                    inputStream.close();
-                }
-            } catch (IOException e) {
-                log.warning(String.format("[AutoSave] Failed to extract library %s", jar));
-            }
-        }
-    }
 
     @Override
     public void onDisable() {
