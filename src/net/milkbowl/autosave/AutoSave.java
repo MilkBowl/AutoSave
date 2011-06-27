@@ -39,8 +39,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
 import net.milkbowl.autosave.customvault.AutoSaveVaultPermission;
-import net.milkbowl.vault.v0.modules.permission.Permission;
-import net.milkbowl.vault.v0.modules.permission.PermissionManager;
+import net.milkbowl.vault.modules.permission.Permission;
+import net.milkbowl.vault.modules.permission.PermissionManager;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;

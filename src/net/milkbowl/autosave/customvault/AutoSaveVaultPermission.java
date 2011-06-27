@@ -1,6 +1,6 @@
 package net.milkbowl.autosave.customvault;
 
-import net.milkbowl.vault.v0.modules.permission.Permission;
+import net.milkbowl.vault.modules.permission.Permission;
 
 import org.bukkit.entity.Player;
 
