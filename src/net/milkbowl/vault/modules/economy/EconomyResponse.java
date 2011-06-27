@@ -1,4 +1,4 @@
-package net.milkbowl.vault.v0.modules.economy;
+package net.milkbowl.vault.modules.economy;
 
 public class EconomyResponse {
 

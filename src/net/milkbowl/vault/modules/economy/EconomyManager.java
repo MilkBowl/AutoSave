@@ -1,15 +1,14 @@
-package net.milkbowl.vault.v0.modules.economy;
+package net.milkbowl.vault.modules.economy;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import net.milkbowl.vault.v0.modules.economy.plugins.Economy_BOSE;
-import net.milkbowl.vault.v0.modules.economy.plugins.Economy_Essentials;
-import net.milkbowl.vault.v0.modules.economy.plugins.Economy_iConomy4;
-import net.milkbowl.vault.v0.modules.economy.plugins.Economy_iConomy5;
-import net.milkbowl.vault.v0.modules.permission.Permission;
+import net.milkbowl.vault.modules.economy.plugins.Economy_BOSE;
+import net.milkbowl.vault.modules.economy.plugins.Economy_Essentials;
+import net.milkbowl.vault.modules.economy.plugins.Economy_iConomy4;
+import net.milkbowl.vault.modules.economy.plugins.Economy_iConomy5;
 
 import org.bukkit.plugin.java.JavaPlugin;
 

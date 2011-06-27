@@ -1,6 +1,6 @@
-package net.milkbowl.vault.v0.modules.permission.plugins;
+package net.milkbowl.vault.modules.permission.plugins;
 
-import net.milkbowl.vault.v0.modules.permission.Permission;
+import net.milkbowl.vault.modules.permission.Permission;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;

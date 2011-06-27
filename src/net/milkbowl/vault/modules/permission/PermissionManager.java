@@ -1,12 +1,12 @@
-package net.milkbowl.vault.v0.modules.permission;
+package net.milkbowl.vault.modules.permission;
 
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 
-import net.milkbowl.vault.v0.modules.permission.plugins.Permission_Permissions;
-import net.milkbowl.vault.v0.modules.permission.plugins.Permission_PermissionsEx;
+import net.milkbowl.vault.modules.permission.plugins.Permission_Permissions;
+import net.milkbowl.vault.modules.permission.plugins.Permission_PermissionsEx;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;

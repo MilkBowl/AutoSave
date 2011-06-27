@@ -1,4 +1,4 @@
-package net.milkbowl.vault.v0.modules.permission;
+package net.milkbowl.vault.modules.permission;
 
 import java.util.logging.Logger;
 

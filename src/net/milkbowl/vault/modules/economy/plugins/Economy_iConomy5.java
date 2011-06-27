@@ -1,7 +1,7 @@
-package net.milkbowl.vault.v0.modules.economy.plugins;
+package net.milkbowl.vault.modules.economy.plugins;
 
-import net.milkbowl.vault.v0.modules.economy.Economy;
-import net.milkbowl.vault.v0.modules.economy.EconomyResponse;
+import net.milkbowl.vault.modules.economy.Economy;
+import net.milkbowl.vault.modules.economy.EconomyResponse;
 
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;

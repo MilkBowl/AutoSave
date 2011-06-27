@@ -1,4 +1,4 @@
-package net.milkbowl.vault.v0.modules.economy;
+package net.milkbowl.vault.modules.economy;
 
 import java.util.logging.Logger;
 
