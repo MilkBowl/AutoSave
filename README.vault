@@ -60,10 +60,63 @@ Vault provides abstraction for the following categories and plugins:
 =============================
 Implementing Economy
 =============================
-To be documented soon.
+Implementation is simple, create an instance and load!  Makes it simple to
+declare and initialize outside of your onEnable() method, and then load during.
 
+Example:
+
+public void onEnable() {
+    EconomyManager econManager = new EconomyManager(this);
+    if(!econManager.load()) {
+        // No valid economies were found, probably best to bail out
+        // You should choose how to best handle this situation for your plugin!
+        log.warning(String.format(
+                "[%s] No Economies were found! Disabling plugin.",
+                getDescription().getName())
+            );
+	getPluginLoader().disablePlugin(this);
+    }
+
+    // Now that we've initialized our Economy, lets give Cerealk 1000!
+    EconomyResponse response = econManager.depositPlayer("Cerealk", 1000);
+    if(response.transactionSuccess()) {
+        log.info(String.format(
+                "Cerealk was paid %s and now has %s!",
+                econManager.format(response.amount),
+                econManager.format(response.balance))
+            );
+    } else {
+        log.warning("I couldn't pay Cerealk!!!" + response.errorMessage);
+    }
+}
 
 =============================
 Implementing Permissions
 =============================
-To be documented soon.
+Implementation is simple, create an instance and load!  Makes it simple to
+declare and initialize outside of your onEnable() method, and then load during.
+
+Example:
+
+public void onEnable() {
+    PermissionManager permManager = new PermissionManager(this);
+    if(!permManager.load()) {
+        // No valid permissions were found, probably best to bail out
+        // You should choose how to best handle this situation for your plugin!
+        log.warning(String.format(
+                "[%s] No Permissions were found! Disabling plugin.",
+                getDescription().getName())
+            );
+        getPluginLoader().disablePlugin(this);
+    }
+
+    // Now that we've initialized our Permissions, lets see if Cerealk has
+    // example.test permission (node)!
+    if(permManager.hasPermission("Cerealk", "example.test")) {
+        // Indeed he does!
+        log.info("Cerealk has example.test node!");
+    } else {
+        // Nope, he sucks
+        log.info("Cerealk does NOT have example.test node!");
+    }
+}
