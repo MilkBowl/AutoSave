@@ -26,7 +26,7 @@ JDK used along side your plugin!  A testing class may eventually be added, but
 there is little to no need at this moment.
 
 
-## Dependancies
+## Dependencies
 Because Vault provides a bridge to other plugins, their binaries will be
 required to build from.  To ease this, they have been included in the lib
 folder and will be updated from time to time.
