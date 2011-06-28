@@ -30,10 +30,19 @@ public class EconomyManager {
     private Economy activeEconomy = null;
     private static final Logger log = Logger.getLogger("Minecraft");
 
+    /**
+     * Constructs a new instance of EconomyManager provided an instance of a JavaPlugin
+     * @param plugin Your plugin (should be "this")
+     */
     public EconomyManager(JavaPlugin plugin) {
         this.plugin = plugin;
     }
     
+    /**
+     * Loads available Economies including a custom declared economy from a Map
+     * @param economies Map of name->Economy defining additional custom economies to attempt to use
+     * @return Success of the loading process
+     */
     public boolean load(Map<String, Economy> economies) {
         // Try to load Provided Permissions
         Iterator<String> it = economies.keySet().iterator();
@@ -51,6 +60,10 @@ public class EconomyManager {
         }
     }
 
+    /**
+     * Loads available Economies
+     * @return Success of the loading process
+     */
     public boolean load() {
         // Try to load BOSEconomy
         if (packageExists(new String[] { "cosine.boseconomy.BOSEconomy" })) {
@@ -121,22 +134,48 @@ public class EconomyManager {
         }
     }
 
+    /**
+     * Accessor for Name of Economy
+     * @return Name of active Economy
+     */
     public String getName() {
         return getEconomy().getName();
     }
 
+    /**
+     * Formats value to human readable forms
+     * @param amount Value to format
+     * @return Human readable form of amount
+     */
     public String format(double amount) {
         return getEconomy().format(amount);
     }
 
+    /**
+     * Returns current player balance
+     * @param playerName Player name
+     * @return Response containing amount (balance) and other meta data
+     */
     public EconomyResponse getBalance(String playerName) {
         return getEconomy().getBalance(playerName);
     }
 
+    /**
+     * Withdraw amount from a player account
+     * @param playerName Player name
+     * @param amount Amount to withdraw
+     * @return Response containing amount removed, and new balance
+     */
     public EconomyResponse withdrawPlayer(String playerName, double amount) {
         return getEconomy().withdrawPlayer(playerName, amount);
     }
 
+    /**
+     * Deposit amount to a player account
+     * @param playerName Player name
+     * @param amount Amount to deposit
+     * @return Response containing amount added, and new balance
+     */
     public EconomyResponse depositPlayer(String playerName, double amount) {
         return getEconomy().depositPlayer(playerName, amount);
     }

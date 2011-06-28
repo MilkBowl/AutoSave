@@ -30,10 +30,19 @@ public class PermissionManager {
     private Permission activePermission = null;
     private static final Logger log = Logger.getLogger("Minecraft");
 
+    /**
+     * Constructs a new instance of PermissionManager provided an instance of a JavaPlugin
+     * @param plugin Your plugin (should be "this")
+     */
     public PermissionManager(JavaPlugin plugin) {
         this.plugin = plugin;
     }
-    
+
+    /**
+     * Loads available Permissions including a custom declared permission from a Map
+     * @param permissions Map of name->Permission defining additional custom permissions to attempt to use
+     * @return Success of the loading process
+     */
     public boolean load(Map<String, Permission> permissions) {
         // Try to load Provided Permissions
         Iterator<String> it = permissions.keySet().iterator();
@@ -50,7 +59,11 @@ public class PermissionManager {
             return false;
         }
     }
-    
+
+    /**
+     * Loads available Permissions
+     * @return Success of the loading process
+     */
     public boolean load() {
         
         // Try to load PermissionsEx
@@ -104,16 +117,36 @@ public class PermissionManager {
         }
     }
     
+    /**
+     * Check if player has a permission node
+     * @param player Player name
+     * @param permission Permission node (ie: pluginname.function)
+     * @return Value
+     */
     public boolean hasPermission(Player player, String permission) {
         boolean rVal = getPermission().hasPermission(player, permission);
         return rVal;
     }
     
+    /**
+     * Check if player is in a group
+     * @param worldName World name
+     * @param playerName Player name
+     * @param groupName Group name
+     * @return Value
+     */
     public boolean inGroup(String worldName, String playerName, String groupName) {
         boolean rVal = getPermission().inGroup(worldName, playerName, groupName);
         return rVal;
     }
     
+    /**
+     * Get integer value from an info node (lowest value)
+     * @param world World name
+     * @param playerName Player name
+     * @param node Node name
+     * @return Value
+     */
     public int getInfoIntLow(String world, String playerName, String node) {
         int rVal = getPermission().getInfoInt(world, playerName, node);
         return rVal;
