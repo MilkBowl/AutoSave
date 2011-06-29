@@ -17,24 +17,18 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import net.milkbowl.autosave.customvault.AutoSaveVaultPermission;
-import net.milkbowl.vault.modules.permission.Permission;
-import net.milkbowl.vault.modules.permission.PermissionManager;
+import net.milkbowl.vault.Vault;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -43,6 +37,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -58,7 +53,6 @@ public class AutoSave extends JavaPlugin {
     private AutoSavePlayerListener playerListener = null;
     protected Date lastSave = null;
     protected int numPlayers = 0;
-    private PermissionManager permManager = null;
 
     @Override
     public void onDisable() {
@@ -143,23 +137,15 @@ public class AutoSave extends JavaPlugin {
         // Notify on logger load
         log.info(String.format("[%s] Version %s is enabled: %s", pdfFile.getName(), pdfFile.getVersion(), config.varUuid.toString()));
         
-        // Register Vault
-        setPermissionManager(new PermissionManager(this));
-        Map<String, Permission> customPerms = new HashMap<String, Permission>();
-        customPerms.put("Local Permissions", (Permission) new AutoSaveVaultPermission());
-        if(!getPermissionManager().load(customPerms)) {
-            // no valid permissions, display error message and disables
-            log.warning(String.format("[%s] FATAL: Permissions Not Found!", this.getDescription().getName()));
+        // Obtain Vault
+        Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
+        if(x != null & x instanceof Vault) {
+            log.info(String.format("[%s] Hooked into %s %s", getDescription().getName(), x.getDescription().getName(), x.getDescription().getVersion()));
+        } else {
+            log.warning(String.format("[%s] Vault was NOT found! Disabling plugin.", getDescription().getName()));
             getPluginLoader().disablePlugin(this);
+            return;
         }
-    }
-
-    public PermissionManager getPermissionManager() {
-        return permManager;
-    }
-
-    public void setPermissionManager(PermissionManager permManager) {
-        this.permManager = permManager;
     }
 
     public void writeConfigFile() {
@@ -310,7 +296,7 @@ public class AutoSave extends JavaPlugin {
             return true;
         } else if (config.varPermissions) {
             // Permissions -- check it!
-            return permManager.hasPermission(player, permission);
+            return Vault.getPermission().hasPermission(player, permission, false);
         } else {
             // No permissions, default to Op status
             // All permissions pass or fail on this
