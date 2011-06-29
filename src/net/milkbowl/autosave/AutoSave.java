@@ -53,6 +53,7 @@ public class AutoSave extends JavaPlugin {
     private AutoSavePlayerListener playerListener = null;
     protected Date lastSave = null;
     protected int numPlayers = 0;
+    protected static Vault VAULT = null;
 
     @Override
     public void onDisable() {
@@ -140,7 +141,8 @@ public class AutoSave extends JavaPlugin {
         // Obtain Vault
         Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
         if(x != null & x instanceof Vault) {
-            log.info(String.format("[%s] Hooked into %s %s", getDescription().getName(), x.getDescription().getName(), x.getDescription().getVersion()));
+            VAULT = (Vault) x;
+            log.info(String.format("[%s] Hooked into %s %s", getDescription().getName(), VAULT.getDescription().getName(), VAULT.getDescription().getVersion()));
         } else {
             log.warning(String.format("[%s] Vault was NOT found! Disabling plugin.", getDescription().getName()));
             getPluginLoader().disablePlugin(this);
@@ -296,7 +298,7 @@ public class AutoSave extends JavaPlugin {
             return true;
         } else if (config.varPermissions) {
             // Permissions -- check it!
-            return Vault.getPermission().hasPermission(player, permission, false);
+            return VAULT.getPermission().hasPermission(player, permission, false);
         } else {
             // No permissions, default to Op status
             // All permissions pass or fail on this
