@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <project default="main">
+
+    <property environment="env"/>
+
     <path id="classpath">
         <fileset dir="lib" includes="**/*.jar"/>
     </path>
@@ -15,12 +18,21 @@
 		</delete>
 		<delete file="AutoSave.jar" />
 		<mkdir dir="bin"/>
+		<echo>Retreiving Libraries</echo>
+		<mkdir dir="lib"/>
+	        <echo>- Bukkit</echo>
+                <get src="http://ci.milkbowl.net/job/Bukkit/lastSuccessfulBuild/artifact/target/bukkit-0.0.1-SNAPSHOT.jar"
+                       	dest="lib/bukkit.jar" verbose="false" usetimestamp="true" />
+                <echo>- Vault</echo>
+                <get src="http://ci.milkbowl.net/job/Vault/lastSuccessfulBuild/artifact/Vault.jar"
+                	dest="lib/Vault.jar" verbose="false" usetimestamp="true"/>
 	</target>
   
     <target name="compile" description="Compilation target">
     	<echo>Compiling</echo>
         <javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
     	<copy file="plugin.yml" tofile="bin/plugin.yml"/>
+    	<replace file="bin/plugin.yml" token="b000" value="b${env.BUILD_NUMBER}" />
     </target>
   
   <target name="compress" description="Compression target">
