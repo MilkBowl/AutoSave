@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
@@ -28,7 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 
-import net.milkbowl.vault.Vault;
+import net.milkbowl.vault.permission.Permission;
 
 import org.bukkit.ChatColor;
 import org.bukkit.World;
@@ -40,6 +41,7 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AutoSave extends JavaPlugin {
@@ -53,7 +55,7 @@ public class AutoSave extends JavaPlugin {
     private AutoSavePlayerListener playerListener = null;
     protected Date lastSave = null;
     protected int numPlayers = 0;
-    protected static Vault VAULT = null;
+    protected Permission permission = null;
 
     @Override
     public void onDisable() {
@@ -134,20 +136,23 @@ public class AutoSave extends JavaPlugin {
         // Make an HTTP request for anonymous statistic collection
         reportThread = new ReportThread(this, config.varUuid, config.varDebug);
         reportThread.start();
-
+        
+        // Get services
+        retrieveServices();
+        
         // Notify on logger load
         log.info(String.format("[%s] Version %s is enabled: %s", pdfFile.getName(), pdfFile.getVersion(), config.varUuid.toString()));
-        
-        // Obtain Vault
-        Plugin x = this.getServer().getPluginManager().getPlugin("Vault");
-        if(x != null & x instanceof Vault) {
-            VAULT = (Vault) x;
-            log.info(String.format("[%s] Hooked into %s %s", getDescription().getName(), VAULT.getDescription().getName(), VAULT.getDescription().getVersion()));
-        } else {
-            log.warning(String.format("[%s] Vault was NOT found! Disabling plugin.", getDescription().getName()));
-            getPluginLoader().disablePlugin(this);
-            return;
+    }
+    
+    public void retrieveServices() {
+        Collection<RegisteredServiceProvider<Permission>> perms = this.getServer().getServicesManager().getRegistrations(net.milkbowl.vault.permission.Permission.class);
+        for(RegisteredServiceProvider<Permission> perm : perms) {
+            Permission p = perm.getProvider();
+            log.info(String.format("[%s] Found Service (Permission) %s", getDescription().getName(), p.getName()));
         }
+        
+        permission = this.getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class).getProvider();
+        log.info(String.format("[%s] Using Permission Provider %s", getDescription().getName(), permission.getName()));
     }
 
     public void writeConfigFile() {
@@ -298,7 +303,7 @@ public class AutoSave extends JavaPlugin {
             return true;
         } else if (config.varPermissions) {
             // Permissions -- check it!
-            return VAULT.getPermission().hasPermission(player, permission, false);
+            return this.permission.has(player, permission);
         } else {
             // No permissions, default to Op status
             // All permissions pass or fail on this
