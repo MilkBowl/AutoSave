@@ -51,6 +51,10 @@
 				<attribute name="Built-By" value="${user.name}" />
 			</manifest>
 		</jar>
+		<zip destfile="AutoSave.zip">
+			<fileset dir="." includes="AutoSave.jar"/>
+			<fileset dir="lib" includes="Vault.jar"/>
+		</zip>
 		<delete dir="bin" />
 	 </target>
 </project>
