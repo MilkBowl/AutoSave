@@ -1,47 +1,56 @@
 <?xml version="1.0" ?>
 <project default="main">
 
-    <property environment="env"/>
+	<property environment="env"/>
 
-    <path id="classpath">
-        <fileset dir="lib" includes="**/*.jar"/>
-    </path>
+	<path id="classpath">
+		<fileset dir="lib" includes="**/*.jar"/>
+	</path>
 	
-    <target name="main" depends="clean, compile, compress" description="Main target">
-        <echo>Building the .jar file.</echo>
-    </target>
+	<target name="main" depends="clean, compile, compress" description="Main target">
+		<echo>Building the .jar file.</echo>
+	</target>
 	
 	<target name="clean" description="Cleans project">
 		<echo>Cleaning</echo>
 		<delete failonerror="false">
 			<fileset dir="bin" includes="**/*" />
 		</delete>
-		<delete file="AutoSave.jar" />
+		<delete failonerror="false">
+			<fileset dir="." includes="*.jar" />
+		</delete>
 		<mkdir dir="bin"/>
 		<echo>Retreiving Libraries</echo>
 		<mkdir dir="lib"/>
-	        <echo>- Bukkit</echo>
-                <get src="http://ci.milkbowl.net/job/Bukkit/lastSuccessfulBuild/artifact/target/bukkit-0.0.1-SNAPSHOT.jar"
-                       	dest="lib/bukkit.jar" verbose="false" usetimestamp="true" />
-                <echo>- Vault</echo>
-                <get src="http://ci.milkbowl.net/job/Vault/lastSuccessfulBuild/artifact/Vault.jar"
-                	dest="lib/Vault.jar" verbose="false" usetimestamp="true"/>
+		<echo>- Bukkit</echo>
+		<get src="http://ci.milkbowl.net/job/Bukkit/lastSuccessfulBuild/artifact/target/bukkit-0.0.1-SNAPSHOT.jar" dest="lib/bukkit.jar" verbose="false" usetimestamp="true" />
+		<echo>- Vault</echo>
+		<get src="http://ci.milkbowl.net/job/Vault/lastSuccessfulBuild/artifact/Vault.jar" dest="lib/Vault.jar" verbose="false" usetimestamp="true"/>
 	</target>
   
-    <target name="compile" description="Compilation target">
-    	<echo>Compiling</echo>
-        <javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
-    	<copy file="plugin.yml" tofile="bin/plugin.yml"/>
-    	<replace file="bin/plugin.yml" token="b000" value="b${env.BUILD_NUMBER}" />
-    </target>
+	<target name="compile" description="Compilation target">
+		<echo>Compiling</echo>
+		<javac srcdir="." destdir="bin" debug="on" debuglevel="lines,vars,source" classpathref="classpath" />
+		<copy file="plugin.yml" tofile="bin/plugin.yml"/>
+	</target>
+
+	<target name="processBuildNum" if="env.BUILD_NUMBER">
+		<echo>Setting build number to b${env.BUILD_NUMBER}</echo>
+		<replace file="bin/plugin.yml" token="b000" value="b${env.BUILD_NUMBER}" />
+	</target>
+
+	<target name="processNoBuildNum" unless="env.BUILD_NUMBER">
+		<echo>Setting build number to DEV</echo>
+		<replace file="bin/plugin.yml" token="b000" value="DEV" />
+	</target>
   
-  <target name="compress" description="Compression target">
-  	<echo>Compressing</echo>
-        <jar jarfile="AutoSave.jar" basedir="bin" includes="net/**/*, plugin.yml">
-        	<manifest>
-        		<attribute name="Built-By" value="${user.name}" />
-        	</manifest>
-        </jar>
-    	<delete dir="bin" />
-  </target>
+	<target name="compress" description="Compression target" depends="processBuildNum, processNoBuildNum">
+		<echo>Compressing</echo>
+		<jar jarfile="AutoSave.jar" basedir="bin" includes="net/**/*, plugin.yml">
+			<manifest>
+				<attribute name="Built-By" value="${user.name}" />
+			</manifest>
+		</jar>
+		<delete dir="bin" />
+	 </target>
 </project>
