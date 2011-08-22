@@ -3,4 +3,5 @@
 .project
 .settings
 bin
+lib
 AutoSave.jar
