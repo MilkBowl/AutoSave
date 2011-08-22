@@ -68,7 +68,8 @@ public class AutoSave extends JavaPlugin {
         if (config.varDebug) {
             log.info(String.format("[%s] Stopping Save Thread", pdfFile.getName()));
         }
-        stopSaveThread();
+        stopThread(ThreadType.SAVE);
+        stopThread(ThreadType.REPORT);
 
         // Write Config File
         if (config.varDebug) {
@@ -122,11 +123,10 @@ public class AutoSave extends JavaPlugin {
         }
 
         // Make an HTTP request for anonymous statistic collection
-        reportThread = new ReportThread(this, config.varUuid, config.varDebug);
-        reportThread.start();
+        startThread(ThreadType.REPORT);
         
         // Start AutoSave Thread
-        startSaveThread();
+        startThread(ThreadType.SAVE);
         
         // Notify on logger load
         log.info(String.format("[%s] Version %s is enabled: %s", pdfFile.getName(), pdfFile.getVersion(), config.varUuid.toString()));
@@ -341,10 +341,10 @@ public class AutoSave extends JavaPlugin {
                 // Start thread
                 if (saveThread == null) {
                     sender.sendMessage(config.getMessageStarting());
-                    return startSaveThread();
+                    return startThread(ThreadType.SAVE);
                 } else { // Stop thread
                     sender.sendMessage(config.getMessageStopping());
-                    return stopSaveThread();
+                    return stopThread(ThreadType.SAVE);
                 }
             } else if (args.length == 1 && args[0].equalsIgnoreCase("status")) {
                 // Get Thread Status
@@ -450,15 +450,10 @@ public class AutoSave extends JavaPlugin {
                     // Change report status!
                     boolean newSetting = false;
                     if (args[1].equalsIgnoreCase(config.valueOn)) {
-                        if (reportThread == null || !reportThread.isAlive()) {
-                            reportThread = new ReportThread(this, config.varUuid, config.varDebug);
-                            reportThread.start();
-                        }
+                    	startThread(ThreadType.REPORT);
                         newSetting = true;
                     } else if (args[1].equalsIgnoreCase(config.valueOff)) {
-                        if (reportThread != null) {
-                            reportThread.setRun(false);
-                        }
+                    	stopThread(ThreadType.REPORT);
                         newSetting = false;
                     } else {
                         sender.sendMessage(config.getMessageReportNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
@@ -492,28 +487,58 @@ public class AutoSave extends JavaPlugin {
         return false;
     }
 
-    protected boolean startSaveThread() {
-        if (saveThread == null || !saveThread.isAlive()) {
-            saveThread = new AutoSaveThread(this, config);
-            saveThread.start();
-        }
-        return true;
+    protected boolean startThread(ThreadType type) {
+    	switch(type) {
+    		case REPORT:
+    	        if (reportThread == null || !reportThread.isAlive()) {
+    	        	reportThread = new ReportThread(this, config.varUuid, config.varDebug);
+    	        	reportThread.start();
+    	        }
+    	        return true;
+    		case SAVE:
+    	        if (saveThread == null || !saveThread.isAlive()) {
+    	            saveThread = new AutoSaveThread(this, config);
+    	            saveThread.start();
+    	        }
+    	        return true;
+    		default:
+    			return false;
+    	}
     }
 
-    protected boolean stopSaveThread() {
-        if (saveThread != null) {
-            saveThread.setRun(false);
-            try {
-                saveThread.join(5000);
-                saveThread = null;
-                return true;
-            } catch (InterruptedException e) {
-                log.info(String.format("[%s] Could not stop AutoSaveThread", pdfFile.getName()));
-                return false;
-            }
-        } else {
-            return true;
-        }
+    protected boolean stopThread(ThreadType type) {
+		switch (type) {
+			case REPORT:
+		        if (reportThread == null) {
+		        	return true;
+		        } else {
+		        	reportThread.setRun(false);
+		            try {
+		            	reportThread.join(5000);
+		            	reportThread = null;
+		                return true;
+		            } catch (InterruptedException e) {
+		                log.info(String.format("[%s] Could not stop ReportThread", pdfFile.getName()));
+		                return false;
+		            }
+		        }
+			case SAVE:
+		        if (saveThread == null) {
+		        	return true;
+		        } else {
+		            saveThread.setRun(false);
+		            try {
+		                saveThread.join(5000);
+		                saveThread = null;
+		                return true;
+		            } catch (InterruptedException e) {
+		                log.info(String.format("[%s] Could not stop AutoSaveThread", pdfFile.getName()));
+		                return false;
+		            }
+		        }
+			default:
+				return false;
+		}
     }
 
     public void savePlayers() {
