@@ -71,17 +71,30 @@ public class AutoSaveThread extends Thread {
                 }
             }
 
-            // getServer().savePlayers() & World.save() are not listed as
-            // explicitly threadsafe. Note; getServer().getWorlds() isn't
-            // threadsafe either.
-            plugin.getServer().getScheduler().scheduleAsyncDelayedTask(plugin, new Runnable() {
-
-                public void run() {
-                    plugin.performSave();
-                    plugin.lastSave = new Date();
-                }
-            });
-
+            switch(config.varMode) {
+            	case ASYNCHRONOUS:
+					plugin.getServer().getScheduler()
+							.scheduleAsyncDelayedTask(plugin, new Runnable() {
+	
+								public void run() {
+									plugin.performSave();
+									plugin.lastSave = new Date();
+								}
+							});
+            		break;
+            	case SYNCHRONOUS:
+					plugin.getServer().getScheduler()
+							.scheduleSyncDelayedTask(plugin, new Runnable() {
+								public void run() {
+									plugin.performSave();
+									plugin.lastSave = new Date();
+								}
+							});
+            		break;
+            	default:
+            		log.warning(String.format("[%s] Invalid configuration mode!", plugin.getDescription().getName()));
+            		break;
+            }
         }
     }
 

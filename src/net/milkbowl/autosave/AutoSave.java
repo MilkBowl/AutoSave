@@ -56,9 +56,11 @@ public class AutoSave extends JavaPlugin {
     	performSave();
     	
         // Enable built-in world saving for ASynchronous Mode
-        for(World world : getServer().getWorlds()) {
-        	((CraftWorld) world).getHandle().canSave = true;
-        }
+		if (config.varMode == Mode.ASYNCHRONOUS) {
+			for (World world : getServer().getWorlds()) {
+				((CraftWorld) world).getHandle().canSave = true;
+			}
+		}
     	
         long timeA = 0;
         if (config.varDebug) {
@@ -118,9 +120,11 @@ public class AutoSave extends JavaPlugin {
         }
         
         // Disable built-in world saving for ASynchronous Mode
-        for(World world : getServer().getWorlds()) {
-        	((CraftWorld) world).getHandle().canSave = true;
-        }
+		if (config.varMode == Mode.ASYNCHRONOUS) {
+			for (World world : getServer().getWorlds()) {
+				((CraftWorld) world).getHandle().canSave = true;
+			}
+		}
 
         // Make an HTTP request for anonymous statistic collection
         startThread(ThreadType.REPORT);
@@ -157,8 +161,8 @@ public class AutoSave extends JavaPlugin {
         // Variables
         props.setProperty("var.debug", String.valueOf(config.varDebug));
         props.setProperty("var.interval", String.valueOf(config.varInterval));
-        props.setProperty("var.permissions", String.valueOf(config.varPermissions));
         props.setProperty("var.broadcast", String.valueOf(config.varBroadcast));
+        props.setProperty("var.mode", config.varMode.name());
         if (config.varWorlds == null) {
             props.setProperty("var.worlds", "*");
         } else {
@@ -227,8 +231,8 @@ public class AutoSave extends JavaPlugin {
         // Variables
         config.varDebug = Boolean.parseBoolean(props.getProperty("var.debug", String.valueOf(config.varDebug)));
         config.varBroadcast = Boolean.parseBoolean(props.getProperty("var.broadcast", String.valueOf(config.varBroadcast)));
-        config.varPermissions = Boolean.parseBoolean(props.getProperty("var.permissions", String.valueOf(config.varPermissions)));
         config.varInterval = Integer.parseInt(props.getProperty("var.interval", String.valueOf(config.varInterval)));
+        config.varMode = Mode.valueOf(props.getProperty("var.mode", config.varMode.name()));
 
         String tmpWorlds = props.getProperty("var.worlds", "*");
         config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));

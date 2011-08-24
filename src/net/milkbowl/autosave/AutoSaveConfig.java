@@ -84,9 +84,9 @@ public class AutoSaveConfig {
     public int varInterval = 300;
     public ArrayList<Integer> varWarnTimes = null;
     public boolean varBroadcast = true;
-    public boolean varPermissions = true;
     public boolean varDebug = false;
     public ArrayList<String> varWorlds = null;
+    public Mode varMode = Mode.SYNCHRONOUS;
 
     // Parse Colors
     private String parseColor(String s) {
