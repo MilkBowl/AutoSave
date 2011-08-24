@@ -89,15 +89,13 @@ public class AutoSaveConfig {
         varMode = Mode.valueOf(config.getString("var.mode", varMode.name()));
 
         varWorlds = config.getStringList("var.worlds", null);
-        if(varWorlds == null) {
-        	varWorlds = new ArrayList<String>();
+        if(varWorlds.size() == 0) {
         	varWorlds.add("*");
         	config.setProperty("var.worlds", varWorlds);
         }
         
         varWarnTimes = config.getIntList("var.warntime", null);
-        if(varWorlds == null) {
-        	varWarnTimes = new ArrayList<Integer>();
+        if(varWarnTimes.size() == 0) {
         	varWarnTimes.add(0);
         	config.setProperty("var.warntime", varWarnTimes);
         }
