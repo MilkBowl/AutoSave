@@ -144,20 +144,11 @@ public class AutoSave extends JavaPlugin {
 
         if (commandName.equals("autosave")) {
             if (args.length == 0) {
-                // Perform save
-                // Players
-                savePlayers();
-                sendMessage(sender, config.messageSavePlayers);
-                // Worlds
-                int worlds = saveWorlds();
-                sendMessage(sender, config.messageSaveWorlds.replaceAll("\\{%NUMSAVED%\\}", String.valueOf(worlds)));
-                if (worlds > 0) {
-                    return true;
-                } else {
-                    return false;
-                }
+            	performSave();
+            	return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
                 // Shows help for allowed commands
+            	
                 // /save
                 sendMessage(sender, "&f/save&7 - &3Saves all players & worlds");
 
