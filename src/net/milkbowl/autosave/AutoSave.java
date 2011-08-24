@@ -414,6 +414,11 @@ public class AutoSave extends JavaPlugin {
     		return;
     	}
     	
+    	if(getServer().getOnlinePlayers().length == 0) {
+    		// No players online, don't bother saving.
+    		return;
+    	}
+    	
     	// Lock
     	saveInProgress = true;
     	
