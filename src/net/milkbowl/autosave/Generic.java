@@ -55,22 +55,43 @@ public class Generic {
 	
 	// Parse Colors
 	public static String parseColor(String message) {
-		message = message.replace("&0", ChatColor.BLACK + "");
-		message = message.replace("&1", ChatColor.DARK_BLUE + "");
-		message = message.replace("&2", ChatColor.DARK_GREEN + "");
-		message = message.replace("&3", ChatColor.DARK_AQUA + "");
-		message = message.replace("&4", ChatColor.DARK_RED + "");
-		message = message.replace("&5", ChatColor.DARK_PURPLE + "");
-		message = message.replace("&6", ChatColor.GOLD + "");
-		message = message.replace("&7", ChatColor.GRAY + "");
-		message = message.replace("&8", ChatColor.DARK_GRAY + "");
-		message = message.replace("&9", ChatColor.BLUE + "");
-		message = message.replace("&a", ChatColor.GREEN + "");
-		message = message.replace("&b", ChatColor.AQUA + "");
-		message = message.replace("&c", ChatColor.RED + "");
-		message = message.replace("&d", ChatColor.LIGHT_PURPLE + "");
-		message = message.replace("&e", ChatColor.YELLOW + "");
-		message = message.replace("&f", ChatColor.WHITE + "");
+		message = message.replaceAll("&0", ChatColor.BLACK + "");
+		message = message.replaceAll("&1", ChatColor.DARK_BLUE + "");
+		message = message.replaceAll("&2", ChatColor.DARK_GREEN + "");
+		message = message.replaceAll("&3", ChatColor.DARK_AQUA + "");
+		message = message.replaceAll("&4", ChatColor.DARK_RED + "");
+		message = message.replaceAll("&5", ChatColor.DARK_PURPLE + "");
+		message = message.replaceAll("&6", ChatColor.GOLD + "");
+		message = message.replaceAll("&7", ChatColor.GRAY + "");
+		message = message.replaceAll("&8", ChatColor.DARK_GRAY + "");
+		message = message.replaceAll("&9", ChatColor.BLUE + "");
+		message = message.replaceAll("&a", ChatColor.GREEN + "");
+		message = message.replaceAll("&b", ChatColor.AQUA + "");
+		message = message.replaceAll("&c", ChatColor.RED + "");
+		message = message.replaceAll("&d", ChatColor.LIGHT_PURPLE + "");
+		message = message.replaceAll("&e", ChatColor.YELLOW + "");
+		message = message.replaceAll("&f", ChatColor.WHITE + "");
+		return message;
+	}
+	
+	// Parse Colors
+	public static String stripColor(String message) {
+		message = message.replaceAll("&0", "");
+		message = message.replaceAll("&1", "");
+		message = message.replaceAll("&2", "");
+		message = message.replaceAll("&3", "");
+		message = message.replaceAll("&4", "");
+		message = message.replaceAll("&5", "");
+		message = message.replaceAll("&6", "");
+		message = message.replaceAll("&7", "");
+		message = message.replaceAll("&8", "");
+		message = message.replaceAll("&9", "");
+		message = message.replaceAll("&a", "");
+		message = message.replaceAll("&b", "");
+		message = message.replaceAll("&c", "");
+		message = message.replaceAll("&d", "");
+		message = message.replaceAll("&e", "");
+		message = message.replaceAll("&f", "");
 		return message;
 	}
 }

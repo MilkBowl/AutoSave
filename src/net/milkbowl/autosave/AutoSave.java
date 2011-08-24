@@ -450,22 +450,22 @@ public class AutoSave extends JavaPlugin {
     public void broadcast(String message) {
     	if(!message.equals("")) {
     		getServer().broadcastMessage(Generic.parseColor(message));
-    		log.info(Generic.parseColor(String.format("&f[%s] %s", getDescription().getName(), message)));
+    		log.info(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
     	}
     }
     
     public void debug(String message) {
     	if(config.varDebug) {
-    		log.info(Generic.parseColor(String.format("[%s] %s", getDescription().getName(), message)));
+    		log.info(Generic.stripColor(String.format("[%s] %s", getDescription().getName(), message)));
     	}
     }
     
     public void warn(String message) {
-    	log.warning(String.format("[%s] %s", getDescription().getName(), Generic.parseColor(message)));
+    	log.warning(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
     }
     
     public void warn(String message, Exception e) {
-    	log.log(Level.WARNING, String.format("[%s] %s", getDescription().getName(), Generic.parseColor(message)), e);
+    	log.log(Level.WARNING, String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)), e);
     }
 
 }
