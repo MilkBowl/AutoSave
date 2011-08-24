@@ -14,6 +14,8 @@ package net.milkbowl.autosave;
 
 import java.util.List;
 
+import org.bukkit.ChatColor;
+
 public class Generic {
     public static boolean stringArrayContains(String base, String[] comparesWith) {
 
@@ -49,5 +51,26 @@ public class Generic {
 		} catch (NullPointerException npe) {
 			return "";
 		}
+	}
+	
+	// Parse Colors
+	public static String parseColor(String message) {
+		message = message.replace("&0", ChatColor.BLACK + "");
+		message = message.replace("&1", ChatColor.DARK_BLUE + "");
+		message = message.replace("&2", ChatColor.DARK_GREEN + "");
+		message = message.replace("&3", ChatColor.DARK_AQUA + "");
+		message = message.replace("&4", ChatColor.DARK_RED + "");
+		message = message.replace("&5", ChatColor.DARK_PURPLE + "");
+		message = message.replace("&6", ChatColor.GOLD + "");
+		message = message.replace("&7", ChatColor.GRAY + "");
+		message = message.replace("&8", ChatColor.DARK_GRAY + "");
+		message = message.replace("&9", ChatColor.BLUE + "");
+		message = message.replace("&a", ChatColor.GREEN + "");
+		message = message.replace("&b", ChatColor.AQUA + "");
+		message = message.replace("&c", ChatColor.RED + "");
+		message = message.replace("&d", ChatColor.LIGHT_PURPLE + "");
+		message = message.replace("&e", ChatColor.YELLOW + "");
+		message = message.replace("&f", ChatColor.WHITE + "");
+		return message;
 	}
 }

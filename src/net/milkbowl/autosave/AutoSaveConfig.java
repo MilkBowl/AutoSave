@@ -13,298 +13,102 @@
 package net.milkbowl.autosave;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
-import org.bukkit.ChatColor;
+import org.bukkit.util.config.Configuration;
 
 public class AutoSaveConfig {
-
-    // Colors
-    private static final Map<String, ChatColor> COLOR_MAP = new HashMap<String, ChatColor>();
-    static {
-        COLOR_MAP.put("%AQUA%", ChatColor.AQUA);
-        COLOR_MAP.put("%BLACK%", ChatColor.BLACK);
-        COLOR_MAP.put("%BLUE%", ChatColor.BLUE);
-        COLOR_MAP.put("%DARK_AQUA%", ChatColor.DARK_AQUA);
-        COLOR_MAP.put("%DARK_BLUE%", ChatColor.DARK_BLUE);
-        COLOR_MAP.put("%DARK_GRAY%", ChatColor.DARK_GRAY);
-        COLOR_MAP.put("%DARK_GREEN%", ChatColor.DARK_GREEN);
-        COLOR_MAP.put("%DARK_PURPLE%", ChatColor.DARK_PURPLE);
-        COLOR_MAP.put("%DARK_RED%", ChatColor.DARK_RED);
-        COLOR_MAP.put("%GOLD%", ChatColor.GOLD);
-        COLOR_MAP.put("%GRAY%", ChatColor.GRAY);
-        COLOR_MAP.put("%GREEN%", ChatColor.GREEN);
-        COLOR_MAP.put("%LIGHT_PURPLE%", ChatColor.LIGHT_PURPLE);
-        COLOR_MAP.put("%RED%", ChatColor.RED);
-        COLOR_MAP.put("%WHITE%", ChatColor.WHITE);
-        COLOR_MAP.put("%YELLOW%", ChatColor.YELLOW);
-    }
+	
+	Configuration config;
+	
+	public AutoSaveConfig(Configuration config) {
+		this.config = config;
+	}
 
     // Messages
-    protected String messageBroadcastPre = "%BLUE%World Auto-Saving";
-    protected String messageBroadcastPost = "%BLUE%World Auto-Save Complete";
-    protected String messageStatusFail = "%BLUE%Auto Save has stopped, check the server logs for more info";
-    protected String messageStatusNotRun = "%BLUE%Auto Save is running but has not yet saved.";
-    protected String messageStatusSuccess = "%BLUE%Auto Save is running and last saved at {%DATE%}.";
-    protected String messageStatusOff = "%BLUE%Auto Save is not running (disabled)";
-    protected String messageInsufficientPermissions = "%RED%You do not have access to that command.";
-    protected String messageStopping = "%BLUE%Stopping Auto Saves";
-    protected String messageStarting = "%BLUE%Starting Auto Saves";
-    protected String messageSaveWorlds = "%BLUE%{%NUMSAVED%} Worlds Saved";
-    protected String messageSavePlayers = "%BLUE%Players Saved";
-    protected String messageIntervalNotANnumber = "%RED%You must enter a valid number, ex: /save interval 300";
-    protected String messageIntervalChangeSuccess = "%BLUE%Auto Save interval is now {%INTERVAL%}";
-    protected String messageIntervalLookup = "%BLUE%Auto Save interval is {%INTERVAL%}";
-    protected String messageWarnNotANnumber = "%RED%You must enter a valid number, ex: /save warn 300";
-    protected String messageWarnChangeSuccess = "%BLUE%Auto Save warning time is now {%WARN%}";
-    protected String messageWarnLookup = "%BLUE%Auto Save warning time is {%WARN%}";
-    protected String messageBroadcastChangeSuccess = "%BLUE%Auto Save broadcast is now {%BROADCAST%}";
-    protected String messageBroadcastLookup = "%BLUE%Auto Save broadcast is {%BROADCAST%}";
-    protected String messageBroadcastNotValid = "%RED%You must enter a valid setting ({%ON%}, {%OFF%})";
-    protected String messageDebugChangeSuccess = "%BLUE%Auto Save debug is now {%DEBUG%}";
-    protected String messageDebugLookup = "%BLUE%Auto Save debug is {%DEBUG%}";
-    protected String messageDebugNotValid = "%RED%You must enter a valid setting ({%ON%}, {%OFF%})";
-    protected String messageWorldChangeSuccess = "%BLUE%World Save List is now {%WORLDS%}";
-    protected String messageWorldLookup = "%BLUE%World Save List is {%WORLDS%}";
-    protected String messageVersion = "%BLUE%AutoSave v{%VERSION%}, Instance {%UUID%}";
-    protected String messageWarning = "%BLUE%Warning, AutoSave will commence soon.";
-    protected String messageReportLookup = "%BLUE%Auto Save report is {%REPORT%}";
-    protected String messageReportNotValid = "%RED%You must enter a valid setting ({%ON%}, {%OFF%})";
-    protected String messageReportChangeSuccess = "%BLUE%Auto Save report is now {%REPORT%}";
+    protected String messageBroadcastPre = "&9World AutoSaving";
+    protected String messageBroadcastPost = "&9World AutoSave Complete";
+    protected String messageStatusFail = "&9AutoSave has stopped, check the server logs for more info";
+    protected String messageStatusNotRun = "&9AutoSave is running but has not yet saved.";
+    protected String messageStatusSuccess = "&9AutoSave is running and last saved at {%DATE%}.";
+    protected String messageStatusOff = "&9AutoSave is not running (disabled)";
+    protected String messageInsufficientPermissions = "&cYou do not have access to that command.";
+    protected String messageStopping = "&9Stopping AutoSave";
+    protected String messageStarting = "&9Starting AutoSave";
+    protected String messageSaveWorlds = "&9{%NUMSAVED%} Worlds Saved";
+    protected String messageSavePlayers = "&9Players Saved";
+    protected String messageInfoNaN = "&cYou must enter a valid number, ex: 300";
+    protected String messageInfoChangeSuccess = "&9${VARIABLE} has been updated.";
+    protected String messageInfoLookup = "&9${VARIABLE} is ${VALUE}";
+    protected String messageInfoListLookup = "&9${VARIABLE} is set to [${VALUE}]";
+    protected String messageInfoInvalid = "&cYou must enter a valid setting (${VALIDSETTINGS})";
+    protected String messageVersion = "&9AutoSave v{%VERSION%}, Instance {%UUID%}";
+    protected String messageWarning = "&9Warning, AutoSave will commence soon.";
 
     // Values
-    public String valueOn = "on";
-    public String valueOff = "off";
+    protected String valueOn = "on";
+    protected String valueOff = "off";
 
     // Variables
-    public UUID varUuid;
-    public boolean varReport = true;
-    public int varInterval = 300;
-    public ArrayList<Integer> varWarnTimes = null;
-    public boolean varBroadcast = true;
-    public boolean varDebug = false;
-    public ArrayList<String> varWorlds = null;
-    public Mode varMode = Mode.SYNCHRONOUS;
+    protected UUID varUuid;
+    protected boolean varReport = true;
+    protected int varInterval = 300;
+    protected List<Integer> varWarnTimes = null;
+    protected boolean varBroadcast = true;
+    protected boolean varDebug = false;
+    protected List<String> varWorlds = null;
+    protected Mode varMode = Mode.SYNCHRONOUS;
+    
+    public void load() {
 
-    // Parse Colors
-    private String parseColor(String s) {
-        for (String key : COLOR_MAP.keySet()) {
-            s = s.replaceAll(key, COLOR_MAP.get(key).toString());
+        // Messages
+    	messageBroadcastPre = config.getString("messages.broadcast.pre", messageBroadcastPre);
+    	messageBroadcastPost = config.getString("messages.broadcast.post", messageBroadcastPost);
+    	messageStatusFail = config.getString("messages.status.fail", messageStatusFail);
+    	messageStatusNotRun = config.getString("messages.status.notrun", messageStatusNotRun);
+    	messageStatusSuccess = config.getString("messages.status.success", messageStatusSuccess);
+    	messageStatusOff = config.getString("messages.status.off", messageStatusOff);
+    	messageInsufficientPermissions = config.getString("messages.insufficentpermissions", messageInsufficientPermissions);
+    	messageStopping = config.getString("messages.stopping", messageStopping);
+    	messageStarting = config.getString("messages.starting", messageStarting);
+    	messageSaveWorlds = config.getString("messages.save.worlds", messageSaveWorlds);
+    	messageSavePlayers = config.getString("messages.save.players", messageSavePlayers);
+    	messageInfoNaN = config.getString("messages.info.nan", messageInfoNaN);
+    	messageInfoChangeSuccess = config.getString("messages.info.changesuccess", messageInfoChangeSuccess);
+    	messageInfoLookup = config.getString("messages.info.lookup", messageInfoLookup);
+    	messageInfoListLookup = config.getString("messages.info.listlookup", messageInfoListLookup);
+    	messageInfoInvalid = config.getString("messages.info.invalid", messageInfoInvalid);
+    	messageVersion = config.getString("messages.version", messageVersion);
+    	messageWarning = config.getString("messages.warning", messageWarning);
+
+        // Values
+        valueOn = config.getString("value.on", valueOn);
+        valueOff = config.getString("value.off", valueOff);
+
+        // Variables
+        varDebug = config.getBoolean("var.debug", varDebug);
+        varBroadcast = config.getBoolean("var.broadcast", varBroadcast);
+        varInterval = config.getInt("var.interval", varInterval);
+        varMode = Mode.valueOf(config.getString("var.mode", varMode.name()));
+
+        varWorlds = config.getStringList("var.worlds", null);
+        if(varWorlds == null) {
+        	varWorlds = new ArrayList<String>();
+        	varWorlds.add("*");
+        	config.setProperty("var.worlds", varWorlds);
+        }
+        
+        varWarnTimes = config.getIntList("var.warntime", null);
+        if(varWorlds == null) {
+        	varWarnTimes = new ArrayList<Integer>();
+        	varWarnTimes.add(0);
+        	config.setProperty("var.warntime", varWarnTimes);
         }
 
-        return s;
-    }
-
-    // Accessors & Mutators
-    public String getMessageBroadcastPre() {
-        return parseColor(messageBroadcastPre);
-    }
-    public void setMessageBroadcastPre(String messageBroadcastPre) {
-        this.messageBroadcastPre = messageBroadcastPre;
-    }
-    
-    public String getMessageBroadcastPost() {
-        return parseColor(messageBroadcastPost);
-    }
-    public void setMessageBroadcastPost(String messageBroadcastPost) {
-        this.messageBroadcastPost = messageBroadcastPost;
-    }
-    
-    public String getMessageStatusFail() {
-        return parseColor(messageStatusFail);
-    }
-    public void setMessageStatusFail(String messageStatusFail) {
-        this.messageStatusFail = messageStatusFail;
-    }
-    
-    public String getMessageStatusNotRun() {
-        return parseColor(messageStatusNotRun);
-    }
-    public void setMessageStatusNotRun(String messageStatusNotRun) {
-        this.messageStatusNotRun = messageStatusNotRun;
-    }
-    
-    public String getMessageStatusSuccess() {
-        return parseColor(messageStatusSuccess);
-    }
-    public void setMessageStatusSuccess(String messageStatusSuccess) {
-        this.messageStatusSuccess = messageStatusSuccess;
-    }
-    
-    public String getMessageStatusOff() {
-        return parseColor(messageStatusOff);
-    }
-    public void setMessageStatusOff(String messageStatusOff) {
-        this.messageStatusOff = messageStatusOff;
-    }
-    
-    public String getMessageInsufficientPermissions() {
-        return parseColor(messageInsufficientPermissions);
-    }
-    public void setMessageInsufficientPermissions(String messageInsufficientPermissions) {
-        this.messageInsufficientPermissions = messageInsufficientPermissions;
-    }
-    
-    public String getMessageStopping() {
-        return parseColor(messageStopping);
-    }
-    public void setMessageStopping(String messageStopping) {
-        this.messageStopping = messageStopping;
-    }
-    
-    public String getMessageStarting() {
-        return parseColor(messageStarting);
-    }
-    public void setMessageStarting(String messageStarting) {
-        this.messageStarting = messageStarting;
-    }
-    
-    public String getMessageSaveWorlds() {
-        return parseColor(messageSaveWorlds);
-    }
-    public void setMessageSaveWorlds(String messageSaveWorlds) {
-        this.messageSaveWorlds = messageSaveWorlds;
-    }
-    
-    public String getMessageSavePlayers() {
-        return parseColor(messageSavePlayers);
-    }
-    public void setMessageSavePlayers(String messageSavePlayers) {
-        this.messageSavePlayers = messageSavePlayers;
-    }
-    
-    public String getMessageIntervalNotANnumber() {
-        return parseColor(messageIntervalNotANnumber);
-    }
-    public void setMessageIntervalNotANnumber(String messageIntervalNotANnumber) {
-        this.messageIntervalNotANnumber = messageIntervalNotANnumber;
-    }
-    
-    public String getMessageIntervalChangeSuccess() {
-        return parseColor(messageIntervalChangeSuccess);
-    }
-    public void setMessageIntervalChangeSuccess(String messageIntervalChangeSuccess) {
-        this.messageIntervalChangeSuccess = messageIntervalChangeSuccess;
-    }
-    
-    public String getMessageIntervalLookup() {
-        return parseColor(messageIntervalLookup);
-    }
-    public void setMessageIntervalLookup(String messageIntervalLookup) {
-        this.messageIntervalLookup = messageIntervalLookup;
-    }
-    
-    public String getMessageWarnNotANnumber() {
-        return parseColor(messageWarnNotANnumber);
-    }
-    public void getMessageWarnNotANnumber(String messageWarnNotANnumber) {
-        this.messageWarnNotANnumber = messageWarnNotANnumber;
-    }
-    
-    public String getMessageWarnChangeSuccess() {
-        return parseColor(messageWarnChangeSuccess);
-    }
-    public void setMessageWarnChangeSuccess(String messageWarnChangeSuccess) {
-        this.messageWarnChangeSuccess = messageWarnChangeSuccess;
-    }
-    
-    public String getMessageWarnLookup() {
-        return parseColor(messageWarnLookup);
-    }
-    public void setMessageWarnLookup(String messageWarnLookup) {
-        this.messageWarnLookup = messageWarnLookup;
-    }
-    
-    public String getMessageBroadcastChangeSuccess() {
-        return parseColor(messageBroadcastChangeSuccess);
-    }
-    public void setMessageBroadcastChangeSuccess(String messageBroadcastChangeSuccess) {
-        this.messageBroadcastChangeSuccess = messageBroadcastChangeSuccess;
-    }
-    
-    public String getMessageBroadcastLookup() {
-        return parseColor(messageBroadcastLookup);
-    }
-    public void setMessageBroadcastLookup(String messageBroadcastLookup) {
-        this.messageBroadcastLookup = messageBroadcastLookup;
-    }
-    
-    public String getMessageBroadcastNotValid() {
-        return parseColor(messageBroadcastNotValid);
-    }
-    public void setMessageBroadcastNotValid(String messageBroadcastNotValid) {
-        this.messageBroadcastNotValid = messageBroadcastNotValid;
-    }
-    
-    public String getMessageDebugChangeSuccess() {
-        return parseColor(messageDebugChangeSuccess);
-    }
-    public void setMessageDebugChangeSuccess(String messageDebugChangeSuccess) {
-        this.messageDebugChangeSuccess = messageDebugChangeSuccess;
-    }
-    
-    public String getMessageDebugLookup() {
-        return parseColor(messageDebugLookup);
-    }
-    public void setMessageDebugLookup(String messageDebugLookup) {
-        this.messageDebugLookup = messageDebugLookup;
-    }
-    
-    public String getMessageDebugNotValid() {
-        return parseColor(messageDebugNotValid);
-    }
-    public void setMessageDebugNotValid(String messageDebugNotValid) {
-        this.messageDebugNotValid = messageDebugNotValid;
-    }
-    
-    public String getMessageWorldChangeSuccess() {
-        return parseColor(messageWorldChangeSuccess);
-    }
-    public void setMessageWorldChangeSuccess(String messageWorldChangeSuccess) {
-        this.messageWorldChangeSuccess = messageWorldChangeSuccess;
-    }
-    
-    public String getMessageWorldLookup() {
-        return parseColor(messageWorldLookup);
-    }
-    public void setMessageWorldLookup(String messageWorldLookup) {
-        this.messageWorldLookup = messageWorldLookup;
-    }
-    
-    public String getMessageVersion() {
-        return parseColor(messageVersion);
-    }
-    public void setMessageVersion(String messageVersion) {
-        this.messageVersion = messageVersion;
-    }
-    
-    public String getMessageWarning() {
-        return parseColor(messageWarning);
-    }
-    public void setMessageWarning(String messageWarning) {
-        this.messageWarning = messageWarning;
-    }
-    
-    public String getMessageReportLookup() {
-        return parseColor(messageReportLookup);
-    }
-    public void setMessageReportLookup(String messageReportLookup) {
-        this.messageReportLookup = messageReportLookup;
-    }
-    
-    public String getMessageReportNotValid() {
-        return parseColor(messageReportNotValid);
-    }
-    public void setMessageReportNotValid(String messageReportNotValid) {
-        this.messageReportNotValid = messageReportNotValid;
-    }
-    
-    public String getMessageReportChangeSuccess() {
-        return parseColor(messageReportChangeSuccess);
-    }
-    public void setMessageReportChangeSuccess(String messageReportChangeSuccess) {
-        this.messageReportChangeSuccess = messageReportChangeSuccess;
+        varUuid = UUID.fromString(config.getString("var.uuid", UUID.randomUUID().toString()));
+        varReport = config.getBoolean("var.report", varReport);
+        
+        config.save();
     }
 }

@@ -13,19 +13,11 @@
 package net.milkbowl.autosave;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.InvalidPropertiesFormatException;
 import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
@@ -35,19 +27,18 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.craftbukkit.CraftWorld;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AutoSave extends JavaPlugin {
     protected final Logger log = Logger.getLogger("Minecraft");
     private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 
-    private PluginDescriptionFile pdfFile = null;
     private AutoSaveThread saveThread = null;
     private ReportThread reportThread = null;
-    private AutoSaveConfig config = new AutoSaveConfig();
+    private AutoSaveConfig config;
     protected Date lastSave = null;
     protected int numPlayers = 0;
+    protected boolean saveInProgress = false;
 
     @Override
     public void onDisable() {
@@ -68,39 +59,34 @@ public class AutoSave extends JavaPlugin {
         }
         // Stop thread
         if (config.varDebug) {
-            log.info(String.format("[%s] Stopping Save Thread", pdfFile.getName()));
+            log.info(String.format("[%s] Stopping Save Thread", getDescription().getName()));
         }
         stopThread(ThreadType.SAVE);
         stopThread(ThreadType.REPORT);
-
-        // Write Config File
-        if (config.varDebug) {
-            log.info(String.format("[%s] Write Config File", pdfFile.getName()));
-        }
-        writeConfigFile();
 
         if (config.varDebug) {
             long timeB = System.currentTimeMillis();
             long millis = timeB - timeA;
             long durationSeconds = TimeUnit.MILLISECONDS.toSeconds(millis);
 
-            log.info(String.format("[%s] Version %s was disabled in %d seconds", pdfFile.getName(), pdfFile.getVersion(), durationSeconds));
+            log.info(String.format("[%s] Version %s was disabled in %d seconds", getDescription().getName(), getDescription().getVersion(), durationSeconds));
         } else {
-            log.info(String.format("[%s] Version %s is disabled!", pdfFile.getName(), pdfFile.getVersion()));
+            log.info(String.format("[%s] Version %s is disabled!", getDescription().getName(), getDescription().getVersion()));
         }
     }
 
     @Override
     public void onEnable() {
-        // Get Plugin Info
-        pdfFile = this.getDescription();
+    	// Load Configuration
+    	config = new AutoSaveConfig(getConfiguration());
+    	config.load();
 
         // Ensure our folder exists...
         File dir = new File("plugins/AutoSave");
         dir.mkdir();
 
         // Load configuration
-        loadConfigFile();
+        //loadConfigFile();
 
         // Test the waters, make sure we are running a build that has the methods we NEED
         try {
@@ -111,8 +97,8 @@ public class AutoSave extends JavaPlugin {
             org.bukkit.World.class.getMethod("save", new Class[] {});
         } catch (NoSuchMethodException e) {
             // Do error stuff
-            log.severe(String.format("[%s] ERROR: Server version is incompatible with %s!", pdfFile.getName(), pdfFile.getName()));
-            log.severe(String.format("[%s] Could not find method \"%s\", disabling!", pdfFile.getName(), e.getMessage()));
+            log.severe(String.format("[%s] ERROR: Server version is incompatible with %s!", getDescription().getName(), getDescription().getName()));
+            log.severe(String.format("[%s] Could not find method \"%s\", disabling!", getDescription().getName(), e.getMessage()));
 
             // Clean up
             getPluginLoader().disablePlugin(this);
@@ -133,150 +119,7 @@ public class AutoSave extends JavaPlugin {
         startThread(ThreadType.SAVE);
         
         // Notify on logger load
-        log.info(String.format("[%s] Version %s is enabled: %s", pdfFile.getName(), pdfFile.getVersion(), config.varUuid.toString()));
-    }
-
-    public void writeConfigFile() {
-        // Log config
-        if (config.varDebug) {
-            logObject(config);
-        }
-
-        // Write properties file
-        log.info(String.format("[%s] Saving config file", pdfFile.getName()));
-        Properties props = new Properties();
-
-        // Messages
-        props.setProperty("message.broadcastpre", config.messageBroadcastPre);
-        props.setProperty("message.broadcastpost", config.messageBroadcastPost);
-        props.setProperty("message.insufficentpermissions", config.messageInsufficientPermissions);
-        props.setProperty("message.saveworlds", config.messageSaveWorlds);
-        props.setProperty("message.saveplayers", config.messageSavePlayers);
-        props.setProperty("message.warning", config.messageWarning);
-
-        // Values
-        props.setProperty("value.on", config.valueOn);
-        props.setProperty("value.off", config.valueOff);
-
-        // Variables
-        props.setProperty("var.debug", String.valueOf(config.varDebug));
-        props.setProperty("var.interval", String.valueOf(config.varInterval));
-        props.setProperty("var.broadcast", String.valueOf(config.varBroadcast));
-        props.setProperty("var.mode", config.varMode.name());
-        if (config.varWorlds == null) {
-            props.setProperty("var.worlds", "*");
-        } else {
-            props.setProperty("var.worlds", Generic.join(",", config.varWorlds));
-        }
-        props.setProperty("var.warntime", Generic.join(",", config.varWarnTimes));
-
-        if (config.varUuid == null) {
-            config.varUuid = UUID.randomUUID();
-        }
-        props.setProperty("var.uuid", config.varUuid.toString());
-        props.setProperty("var.report", String.valueOf(config.varReport));
-
-        try {
-            props.storeToXML(new FileOutputStream(CONFIG_FILE_NAME), null);
-        } catch (FileNotFoundException e) {
-            // Shouldn't happen...report and continue
-            log.info(String.format("[%s] FileNotFoundException while saving config file", pdfFile.getName()));
-        } catch (IOException e) {
-            // Report and continue
-            log.info(String.format("[%s] IOException while saving config file", pdfFile.getName()));
-        }
-    }
-
-    public void loadConfigFile() {
-        log.info(String.format("[%s] Loading config file", pdfFile.getName()));
-        File confFile = new File(CONFIG_FILE_NAME);
-        if (!confFile.exists()) {
-            writeConfigFile();
-        }
-
-        Properties props = new Properties();
-        try {
-            props.loadFromXML(new FileInputStream(confFile));
-        } catch (FileNotFoundException e) {
-            // Hmmm, shouldnt happen...
-            log.info(String.format("[%s] FileNotFoundException while loading config file", pdfFile.getName()));
-        } catch (InvalidPropertiesFormatException e) {
-            // Report and continue
-            log.info(String.format("[%s] InvalidPropertieFormatException while loading config file", pdfFile.getName()));
-        } catch (IOException e) {
-            // Report and continue
-            log.info(String.format("[%s] IOException while loading config file", pdfFile.getName()));
-        }
-
-        /**
-         * Attempt to load Version 1.0.3 and before values if present, otherwise
-         * load 1.1 version
-         */
-
-        // Messages
-        config.setMessageBroadcastPre( props.getProperty("message.broadcastpre", config.messageBroadcastPre) );
-        config.setMessageBroadcastPost( props.getProperty("message.broadcastpost", config.messageBroadcastPost) );
-        config.setMessageInsufficientPermissions( props.getProperty("message.insufficentpermissions", config.messageInsufficientPermissions) );
-        config.setMessageSaveWorlds( props.getProperty("message.saveworlds", config.messageSaveWorlds) );
-        config.setMessageSavePlayers( props.getProperty("message.saveplayers", config.messageSavePlayers) );
-        config.setMessageDebugChangeSuccess( props.getProperty("message.debugchangesuccess", config.messageDebugChangeSuccess) );
-        config.setMessageDebugLookup( props.getProperty("message.debuglookup", config.messageDebugLookup) );
-        config.setMessageDebugNotValid( props.getProperty("message.debugnotvalue", config.messageDebugNotValid) );
-        config.setMessageWarning( props.getProperty("message.warning", config.messageWarning) );
-
-        // Values
-        config.valueOn = props.getProperty("value.on", config.valueOn);
-        config.valueOff = props.getProperty("value.off", config.valueOff);
-
-        // Variables
-        config.varDebug = Boolean.parseBoolean(props.getProperty("var.debug", String.valueOf(config.varDebug)));
-        config.varBroadcast = Boolean.parseBoolean(props.getProperty("var.broadcast", String.valueOf(config.varBroadcast)));
-        config.varInterval = Integer.parseInt(props.getProperty("var.interval", String.valueOf(config.varInterval)));
-        config.varMode = Mode.valueOf(props.getProperty("var.mode", config.varMode.name()));
-
-        String tmpWorlds = props.getProperty("var.worlds", "*");
-        config.varWorlds = new ArrayList<String>(Arrays.asList(tmpWorlds.split(",")));
-
-        String[] arrWarnTimes = props.getProperty("var.warntime", "0").split(",");
-        config.varWarnTimes = new ArrayList<Integer>();
-        for (String s : arrWarnTimes) {
-            if (!s.equals("")) {
-                config.varWarnTimes.add(Integer.parseInt(s));
-            }
-        }
-        if (config.varWarnTimes.size() == 0) {
-            config.varWarnTimes.add(0);
-        }
-
-        String strUuid = props.getProperty("var.uuid", "");
-        try {
-            config.varUuid = UUID.fromString(strUuid);
-        } catch (IllegalArgumentException e) {
-            config.varUuid = UUID.randomUUID();
-        }
-        config.varReport = Boolean.parseBoolean(props.getProperty("var.report", String.valueOf(config.varReport)));
-
-        if (config.varDebug) {
-            logObject(config);
-        }
-    }
-
-    public void logObject(Object o) {
-        String className = o.getClass().getName();
-        // Log the Object
-        for (Field field : o.getClass().getDeclaredFields()) {
-            // Get our data
-            String name = field.getName();
-            String value = "";
-            try {
-                value = field.get(config).toString();
-            } catch (IllegalAccessException e) {
-                continue;
-            }
-
-            // Log it
-            log.info(String.format("[%s] %s=%s", className, name, value));
-        }
+        log.info(String.format("[%s] Version %s is enabled: %s", getDescription().getName(), getDescription().getVersion(), config.varUuid.toString()));
     }
 
     @Override
@@ -288,14 +131,14 @@ public class AutoSave extends JavaPlugin {
             player = (Player) sender;
             // Check Permissions
             if(!player.isOp()) {
-            	sender.sendMessage(config.getMessageInsufficientPermissions());
+            	sendMessage(sender, config.messageInsufficientPermissions);
             	return true;
             }
         } else if (sender instanceof ConsoleCommandSender) {
         	// Success, this was from the Console
         } else {
         	// Unknown, ignore these people with a pretty message
-        	sender.sendMessage(config.getMessageInsufficientPermissions());
+        	sendMessage(sender, config.messageInsufficientPermissions);
         	return true;
         }
 
@@ -304,10 +147,10 @@ public class AutoSave extends JavaPlugin {
                 // Perform save
                 // Players
                 savePlayers();
-                sender.sendMessage(config.getMessageSavePlayers());
+                sendMessage(sender, config.messageSavePlayers);
                 // Worlds
                 int worlds = saveWorlds();
-                sender.sendMessage(config.getMessageSaveWorlds().replaceAll("\\{%NUMSAVED%\\}", String.valueOf(worlds)));
+                sendMessage(sender, config.messageSaveWorlds.replaceAll("\\{%NUMSAVED%\\}", String.valueOf(worlds)));
                 if (worlds > 0) {
                     return true;
                 } else {
@@ -316,79 +159,79 @@ public class AutoSave extends JavaPlugin {
             } else if (args.length == 1 && args[0].equalsIgnoreCase("help")) {
                 // Shows help for allowed commands
                 // /save
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save - Saves all players & worlds"));
+                sendMessage(sender, "&f/save&7 - &3Saves all players & worlds");
 
                 // /save help
-                sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save help - Displays this dialogue"));
+                sendMessage(sender, "&f/save help&7 - &3Displays this dialogue");
 
                 // /save toggle
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save toggle - Toggles the AutoSave system"));
+                sendMessage(sender, "&f/save toggle&7 - &3Toggles the AutoSave system");
 
                 // /save status
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save status - Reports thread status and last run time"));
+                sendMessage(sender, "&f/save status&7 - &3Reports thread status and last run time");
 
                 // /save interval
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save interval [value] - Sets & retrieves the save interval"));
+                sendMessage(sender, "&f/save interval&7 [value] - &3Sets & retrieves the save interval");
 
                 // /save broadcast
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save broadcast [on|off] - Sets & retrieves the broadcast value"));
+                sendMessage(sender, "&f/save broadcast&7 [on|off] - &3Sets & retrieves the broadcast value");
 
                 // /save report
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save report [on|off] - Sets & retrieves the report value"));
+                sendMessage(sender, "&f/save report&7 [on|off] - &3Sets & retrieves the report value");
 
                 // /save warn
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save warn [value] - Sets & retrieves the warn time in seconds"));
+                sendMessage(sender, "&f/save warn&7 [value] - &3Sets & retrieves the warn time in seconds");
 
                 // /save version
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, "/save version - Prints the version of AutoSave"));
+                sendMessage(sender, "&f/save version&7 - &3Prints the version of AutoSave");
             } else if (args.length == 1 && args[0].equalsIgnoreCase("toggle")) {
                 // Start thread
                 if (saveThread == null) {
-                    sender.sendMessage(config.getMessageStarting());
+                    sendMessage(sender, config.messageStarting);
                     return startThread(ThreadType.SAVE);
                 } else { // Stop thread
-                    sender.sendMessage(config.getMessageStopping());
+                    sendMessage(sender, config.messageStopping);
                     return stopThread(ThreadType.SAVE);
                 }
             } else if (args.length == 1 && args[0].equalsIgnoreCase("status")) {
                 // Get Thread Status
                 if (saveThread == null) {
-                    sender.sendMessage(config.getMessageStatusOff());
+                    sendMessage(sender, config.messageStatusOff);
                 } else {
                     if (saveThread.isAlive()) {
                         if (lastSave == null) {
-                            sender.sendMessage(config.getMessageStatusNotRun());
+                            sendMessage(sender, config.messageStatusNotRun);
                             return true;
                         } else {
-                            sender.sendMessage(config.getMessageStatusSuccess().replaceAll("\\{%DATE%\\}", lastSave.toString()));
+                            sendMessage(sender, config.messageStatusSuccess.replaceAll("\\{%DATE%\\}", lastSave.toString()));
                             return true;
                         }
                     } else {
-                        sender.sendMessage(config.getMessageStatusFail());
+                        sendMessage(sender, config.messageStatusFail);
                         return true;
                     }
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("interval")) {
                 if (args.length == 1) {
                     // Report interval!
-                    sender.sendMessage(config.getMessageIntervalLookup().replaceAll("\\{%INTERVAL%\\}", String.valueOf(config.varInterval)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Interval").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varInterval)));
                     return true;
                 } else if (args.length == 2) {
                     // Change interval!
                     try {
                         int newInterval = Integer.parseInt(args[1]);
                         config.varInterval = newInterval;
-                        sender.sendMessage(config.getMessageIntervalChangeSuccess().replaceAll("\\{%INTERVAL%\\}", String.valueOf(config.varInterval)));
+                        sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Interval"));
                         return true;
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(config.getMessageIntervalNotANnumber());
+                        sendMessage(sender, config.messageInfoNaN);
                         return false;
                     }
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("warn")) {
                 if (args.length == 1) {
                     // Report interval!
-                    sender.sendMessage(config.getMessageWarnLookup().replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes)));
+                	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABE\\}", "Warn Times").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWarnTimes)));
                     return true;
                 } else if (args.length == 2) {
                     // Change interval!
@@ -398,17 +241,17 @@ public class AutoSave extends JavaPlugin {
                             tmpWarn.add(Integer.parseInt(s));
                         }
                         config.varWarnTimes = tmpWarn;
-                        sender.sendMessage(config.getMessageWarnChangeSuccess().replaceAll("\\{%WARN%\\}", Generic.join(",", config.varWarnTimes)));
+                        sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Warn Times"));
                         return true;
                     } catch (NumberFormatException e) {
-                        sender.sendMessage(config.getMessageWarnNotANnumber());
+                        sendMessage(sender, config.messageInfoNaN);
                         return false;
                     }
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("broadcast")) {
                 if (args.length == 1) {
                     // Report broadcast status!
-                    sender.sendMessage(config.getMessageBroadcastLookup().replaceAll("\\{%BROADCAST%\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Broadcast").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change broadcast status!
@@ -418,17 +261,17 @@ public class AutoSave extends JavaPlugin {
                     } else if (args[1].equalsIgnoreCase(config.valueOff)) {
                         newSetting = false;
                     } else {
-                        sender.sendMessage(config.getMessageBroadcastNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
+                    	sendMessage(sender, config.messageInfoInvalid.replaceAll("\\$\\{VALIDSETTINGS\\}", String.format("%s, %s", config.valueOn, config.valueOff)));
                         return false;
                     }
                     config.varBroadcast = newSetting;
-                    sender.sendMessage(config.getMessageBroadcastChangeSuccess().replaceAll("\\{%BROADCAST%\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
+                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Broadcast"));
                     return true;
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("debug")) {
                 if (args.length == 1) {
                     // Report debug status!
-                    sender.sendMessage(config.getMessageDebugLookup().replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Debug").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change debug status!
@@ -438,17 +281,17 @@ public class AutoSave extends JavaPlugin {
                     } else if (args[1].equalsIgnoreCase(config.valueOff)) {
                         newSetting = false;
                     } else {
-                        sender.sendMessage(config.getMessageDebugNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
+                    	sendMessage(sender, config.messageInfoInvalid.replaceAll("\\$\\{VALIDSETTINGS\\}", String.format("%s, %s", config.valueOn, config.valueOff)));
                         return false;
                     }
                     config.varDebug = newSetting;
-                    sender.sendMessage(config.getMessageDebugChangeSuccess().replaceAll("\\{%DEBUG%\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
+                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Debug"));
                     return true;
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("report")) {
                 if (args.length == 1) {
                     // Report report status!
-                    sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.getMessageReportLookup().replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff))));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Reporting").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change report status!
@@ -460,33 +303,30 @@ public class AutoSave extends JavaPlugin {
                     	stopThread(ThreadType.REPORT);
                         newSetting = false;
                     } else {
-                        sender.sendMessage(config.getMessageReportNotValid().replaceAll("\\{%ON%\\}", config.valueOn).replaceAll("\\{%OFF%\\}", config.valueOff));
+                    	sendMessage(sender, config.messageInfoInvalid.replaceAll("\\$\\{VALIDSETTINGS\\}", String.format("%s, %s", config.valueOn, config.valueOff)));
                         return false;
                     }
                     config.varReport = newSetting;
-                    sender.sendMessage(config.getMessageReportChangeSuccess().replaceAll("\\{%REPORT%\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff)));
+                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Reporting"));
                     return true;
                 }
             } else if (args.length == 2 && args[0].equalsIgnoreCase("addworld")) {
                 config.varWorlds.add(args[1]);
-                sender.sendMessage(config.getMessageWorldChangeSuccess().replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
-
+                sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Worlds"));
                 return true;
             } else if (args.length == 2 && args[0].equalsIgnoreCase("remworld")) {
                 config.varWorlds.remove(args[1]);
-                sender.sendMessage(config.getMessageWorldChangeSuccess().replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
-
+                sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Worlds"));
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("world")) {
-                sender.sendMessage(config.getMessageWorldLookup().replaceAll("\\{%WORLDS%\\}", Generic.join(", ", config.varWorlds)));
-
+            	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABE\\}", "Worlds").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWorlds)));
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("version")) {
-                sender.sendMessage(String.format("%s%s", ChatColor.BLUE, config.getMessageVersion().replaceAll("\\{%VERSION%\\}", pdfFile.getVersion()).replaceAll("\\{%UUID%\\}", config.varUuid.toString())));
+            	sendMessage(sender, String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", getDescription().getVersion()).replaceAll("\\{%UUID%\\}", config.varUuid.toString())));
                 return true;
             }
         } else {
-            sender.sendMessage(String.format("Unknown command \"%s\" handled by %s", commandName, pdfFile.getName()));
+        	sendMessage(sender, String.format("Unknown command \"%s\" handled by %s", commandName, getDescription().getName()));
         }
         return false;
     }
@@ -522,7 +362,7 @@ public class AutoSave extends JavaPlugin {
 		            	reportThread = null;
 		                return true;
 		            } catch (InterruptedException e) {
-		                log.info(String.format("[%s] Could not stop ReportThread", pdfFile.getName()));
+		            	warn("Could not stop ReportThread", e);
 		                return false;
 		            }
 		        }
@@ -536,7 +376,7 @@ public class AutoSave extends JavaPlugin {
 		                saveThread = null;
 		                return true;
 		            } catch (InterruptedException e) {
-		                log.info(String.format("[%s] Could not stop AutoSaveThread", pdfFile.getName()));
+		            	warn("Could not stop AutoSaveThread", e);
 		                return false;
 		            }
 		        }
@@ -545,23 +385,19 @@ public class AutoSave extends JavaPlugin {
 		}
     }
 
-    public void savePlayers() {
+    private void savePlayers() {
         // Save the players
-        if (config.varDebug) {
-            log.info(String.format("[%s] Saving players", pdfFile.getName()));
-        }
+    	debug("Saving players");
         this.getServer().savePlayers();
     }
 
-    public int saveWorlds(List<String> worldNames) {
+    private int saveWorlds(List<String> worldNames) {
         // Save our worlds...
         int i = 0;
         List<World> worlds = this.getServer().getWorlds();
         for (World world : worlds) {
             if (worldNames.contains(world.getName())) {
-                if (config.varDebug) {
-                    log.info(String.format("[%s] Saving the world: %s", pdfFile.getName(), world.getName()));
-                }
+            	debug(String.format("Saving world: %s", world.getName()));
                 world.save();
                 i++;
             }
@@ -569,32 +405,32 @@ public class AutoSave extends JavaPlugin {
         return i;
     }
 
-    public int saveWorlds() {
+    private int saveWorlds() {
         // Save our worlds
         int i = 0;
         List<World> worlds = this.getServer().getWorlds();
         for (World world : worlds) {
-            if (config.varDebug) {
-                log.info(String.format("[%s] Saving the world: %s", pdfFile.getName(), world.getName()));
-            }
+        	debug(String.format("Saving world: %s", world.getName()));
             world.save();
             i++;
         }
         return i;
-        // return CommandHelper.queueConsoleCommand(getServer(), "save-all");
     }
 
     public void performSave() {
-        if (config.varBroadcast && !config.getMessageBroadcastPre().equals("")) {
-            getServer().broadcastMessage(config.getMessageBroadcastPre());
-            log.info(String.format("[%s] %s", getDescription().getName(), config.getMessageBroadcastPre()));
-        }
+    	if(saveInProgress) {
+    		warn("Multiple concurrent saves attempted!  Save interval is likely too short!");
+    		return;
+    	}
+    	
+    	// Lock
+    	saveInProgress = true;
+    	
+    	broadcast(config.messageBroadcastPre);
 
         // Save the players
         savePlayers();
-        if (config.varDebug) {
-            log.info(String.format("[%s] Saved Players", getDescription().getName()));
-        }
+        debug("Saved Players");
 
         // Save the worlds
         int saved = 0;
@@ -603,15 +439,42 @@ public class AutoSave extends JavaPlugin {
         } else {
             saved += saveWorlds(config.varWorlds);
         }
-        if (config.varDebug) {
-            log.info(String.format("[%s] Saved %d Worlds", getDescription().getName(), saved));
-        }
+        
+		debug(String.format("Saved %d Worlds", saved));
+        
 
         lastSave = new Date();
-        if (config.varBroadcast && !config.getMessageBroadcastPost().equals("")) {
-            getServer().broadcastMessage(config.getMessageBroadcastPost());
-            log.info(String.format("[%s] %s", getDescription().getName(), config.getMessageBroadcastPost()));
-        }
+		broadcast(config.messageBroadcastPost);
+        
+        // Release
+        saveInProgress = false;
+    }
+    
+    public void sendMessage(CommandSender sender, String message) {
+    	if(!message.equals("")) {
+    		sender.sendMessage(Generic.parseColor(message));
+    	}
+    }
+    
+    public void broadcast(String message) {
+    	if(!message.equals("")) {
+    		getServer().broadcastMessage(Generic.parseColor(message));
+    		log.info(Generic.parseColor(String.format("&f[%s] %s", getDescription().getName(), message)));
+    	}
+    }
+    
+    public void debug(String message) {
+    	if(config.varDebug) {
+    		log.info(Generic.parseColor(String.format("[%s] %s", getDescription().getName(), message)));
+    	}
+    }
+    
+    public void warn(String message) {
+    	log.warning(String.format("[%s] %s", getDescription().getName(), Generic.parseColor(message)));
+    }
+    
+    public void warn(String message, Exception e) {
+    	log.log(Level.WARNING, String.format("[%s] %s", getDescription().getName(), Generic.parseColor(message)), e);
     }
 
 }
