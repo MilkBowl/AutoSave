@@ -194,7 +194,7 @@ public class AutoSave extends JavaPlugin {
                             sendMessage(sender, config.messageStatusNotRun);
                             return true;
                         } else {
-                            sendMessage(sender, config.messageStatusSuccess.replaceAll("\\{%DATE%\\}", lastSave.toString()));
+                            sendMessage(sender, config.messageStatusSuccess.replaceAll("\\$\\{DATE\\}", lastSave.toString()));
                             return true;
                         }
                     } else {
@@ -313,7 +313,7 @@ public class AutoSave extends JavaPlugin {
             	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABE\\}", "Worlds").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWorlds)));
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("version")) {
-            	sendMessage(sender, String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\{%VERSION%\\}", getDescription().getVersion()).replaceAll("\\{%UUID%\\}", config.varUuid.toString())));
+            	sendMessage(sender, String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\$\\{VERSION\\}", getDescription().getVersion()).replaceAll("\\$\\{UUID\\}", config.varUuid.toString())));
                 return true;
             }
         } else {

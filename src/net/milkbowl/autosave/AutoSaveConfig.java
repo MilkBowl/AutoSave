@@ -31,19 +31,17 @@ public class AutoSaveConfig {
     protected String messageBroadcastPost = "&9World AutoSave Complete";
     protected String messageStatusFail = "&9AutoSave has stopped, check the server logs for more info";
     protected String messageStatusNotRun = "&9AutoSave is running but has not yet saved.";
-    protected String messageStatusSuccess = "&9AutoSave is running and last saved at {%DATE%}.";
+    protected String messageStatusSuccess = "&9AutoSave is running and last saved at ${DATE}.";
     protected String messageStatusOff = "&9AutoSave is not running (disabled)";
     protected String messageInsufficientPermissions = "&cYou do not have access to that command.";
     protected String messageStopping = "&9Stopping AutoSave";
     protected String messageStarting = "&9Starting AutoSave";
-    protected String messageSaveWorlds = "&9{%NUMSAVED%} Worlds Saved";
-    protected String messageSavePlayers = "&9Players Saved";
     protected String messageInfoNaN = "&cYou must enter a valid number, ex: 300";
     protected String messageInfoChangeSuccess = "&9${VARIABLE} has been updated.";
     protected String messageInfoLookup = "&9${VARIABLE} is ${VALUE}";
     protected String messageInfoListLookup = "&9${VARIABLE} is set to [${VALUE}]";
     protected String messageInfoInvalid = "&cYou must enter a valid setting (${VALIDSETTINGS})";
-    protected String messageVersion = "&9AutoSave v{%VERSION%}, Instance {%UUID%}";
+    protected String messageVersion = "&9AutoSave v${VERSION}, Instance ${UUID}";
     protected String messageWarning = "&9Warning, AutoSave will commence soon.";
 
     // Values
@@ -72,8 +70,6 @@ public class AutoSaveConfig {
     	messageInsufficientPermissions = config.getString("messages.insufficentpermissions", messageInsufficientPermissions);
     	messageStopping = config.getString("messages.stopping", messageStopping);
     	messageStarting = config.getString("messages.starting", messageStarting);
-    	messageSaveWorlds = config.getString("messages.save.worlds", messageSaveWorlds);
-    	messageSavePlayers = config.getString("messages.save.players", messageSavePlayers);
     	messageInfoNaN = config.getString("messages.info.nan", messageInfoNaN);
     	messageInfoChangeSuccess = config.getString("messages.info.changesuccess", messageInfoChangeSuccess);
     	messageInfoLookup = config.getString("messages.info.lookup", messageInfoLookup);
