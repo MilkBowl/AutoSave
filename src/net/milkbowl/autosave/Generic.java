@@ -25,27 +25,27 @@ import java.util.List;
 import org.bukkit.ChatColor;
 
 public class Generic {
-    public static boolean stringArrayContains(String base, String[] comparesWith) {
+	public static boolean stringArrayContains(String base, String[] comparesWith) {
 
-        for (int i = 0; i < comparesWith.length; i++) {
-            try {
-                if (base.compareTo(comparesWith[i]) == 0) {
-                    return true;
-                }
-            } catch (NullPointerException npe) {
-                return false;
-            }
-        }
+		for (int i = 0; i < comparesWith.length; i++) {
+			try {
+				if (base.compareTo(comparesWith[i]) == 0) {
+					return true;
+				}
+			} catch (NullPointerException npe) {
+				return false;
+			}
+		}
 
-        return false;
-    }
-    
+		return false;
+	}
+
 	public static String join(String glue, List<?> s) {
 		try {
-			if(s == null) {
+			if (s == null) {
 				return "";
 			}
-			
+
 			int k = s.size();
 			if (k == 0) {
 				return null;
@@ -60,7 +60,7 @@ public class Generic {
 			return "";
 		}
 	}
-	
+
 	// Parse Colors
 	public static String parseColor(String message) {
 		message = message.replaceAll("&0", ChatColor.BLACK + "");
@@ -81,7 +81,7 @@ public class Generic {
 		message = message.replaceAll("(?i)&f", ChatColor.WHITE + "");
 		return message;
 	}
-	
+
 	// Parse Colors
 	public static String stripColor(String message) {
 		message = message.replaceAll("&0", "");
