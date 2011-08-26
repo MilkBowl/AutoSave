@@ -51,6 +51,9 @@ public class AutoSave extends JavaPlugin {
 	@Override
 	public void onDisable() {
 
+		// Save config
+		config.save();
+		
 		// Perform a Save NOW!
 		performSave();
 
@@ -94,13 +97,6 @@ public class AutoSave extends JavaPlugin {
 		config = new AutoSaveConfig(getConfiguration());
 		config.load();
 
-		// Ensure our folder exists...
-		File dir = new File("plugins/AutoSave");
-		dir.mkdir();
-
-		// Load configuration
-		// loadConfigFile();
-
 		// Test the waters, make sure we are running a build that has the
 		// methods we NEED
 		try {
@@ -111,12 +107,8 @@ public class AutoSave extends JavaPlugin {
 			org.bukkit.World.class.getMethod("save", new Class[] {});
 		} catch (NoSuchMethodException e) {
 			// Do error stuff
-			log.severe(String.format(
-					"[%s] ERROR: Server version is incompatible with %s!",
-					getDescription().getName(), getDescription().getName()));
-			log.severe(String.format(
-					"[%s] Could not find method \"%s\", disabling!",
-					getDescription().getName(), e.getMessage()));
+			log.severe(String.format("[%s] ERROR: Server version is incompatible with %s!", getDescription().getName(), getDescription().getName()));
+			log.severe(String.format("[%s] Could not find method \"%s\", disabling!", getDescription().getName(), e.getMessage()));
 
 			// Clean up
 			getPluginLoader().disablePlugin(this);
@@ -137,9 +129,7 @@ public class AutoSave extends JavaPlugin {
 		startThread(ThreadType.SAVE);
 
 		// Notify on logger load
-		log.info(String.format("[%s] Version %s is enabled: %s",
-				getDescription().getName(), getDescription().getVersion(),
-				config.varUuid.toString()));
+		log.info(String.format("[%s] Version %s is enabled: %s", getDescription().getName(), getDescription().getVersion(), config.varUuid.toString()));
 	}
 
 	@Override

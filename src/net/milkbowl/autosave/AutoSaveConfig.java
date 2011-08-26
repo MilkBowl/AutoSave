@@ -20,7 +20,6 @@
 
 package net.milkbowl.autosave;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +27,7 @@ import org.bukkit.util.config.Configuration;
 
 public class AutoSaveConfig {
 
-	Configuration config;
+	private Configuration config;
 
 	public AutoSaveConfig(Configuration config) {
 		this.config = config;
@@ -69,34 +68,20 @@ public class AutoSaveConfig {
 	public void load() {
 
 		// Messages
-		messageBroadcastPre = config.getString("messages.broadcast.pre",
-				messageBroadcastPre);
-		messageBroadcastPost = config.getString("messages.broadcast.post",
-				messageBroadcastPost);
-		messageStatusFail = config.getString("messages.status.fail",
-				messageStatusFail);
-		messageStatusNotRun = config.getString("messages.status.notrun",
-				messageStatusNotRun);
-		messageStatusSuccess = config.getString("messages.status.success",
-				messageStatusSuccess);
-		messageStatusOff = config.getString("messages.status.off",
-				messageStatusOff);
-		messageInsufficientPermissions = config.getString(
-				"messages.insufficentpermissions",
-				messageInsufficientPermissions);
-		messageStopping = config
-				.getString("messages.stopping", messageStopping);
-		messageStarting = config
-				.getString("messages.starting", messageStarting);
+		messageBroadcastPre = config.getString("messages.broadcast.pre", messageBroadcastPre);
+		messageBroadcastPost = config.getString("messages.broadcast.post", messageBroadcastPost);
+		messageStatusFail = config.getString("messages.status.fail", messageStatusFail);
+		messageStatusNotRun = config.getString("messages.status.notrun", messageStatusNotRun);
+		messageStatusSuccess = config.getString("messages.status.success", messageStatusSuccess);
+		messageStatusOff = config.getString("messages.status.off", messageStatusOff);
+		messageInsufficientPermissions = config.getString("messages.insufficentpermissions", messageInsufficientPermissions);
+		messageStopping = config.getString("messages.stopping", messageStopping);
+		messageStarting = config.getString("messages.starting", messageStarting);
 		messageInfoNaN = config.getString("messages.info.nan", messageInfoNaN);
-		messageInfoChangeSuccess = config.getString(
-				"messages.info.changesuccess", messageInfoChangeSuccess);
-		messageInfoLookup = config.getString("messages.info.lookup",
-				messageInfoLookup);
-		messageInfoListLookup = config.getString("messages.info.listlookup",
-				messageInfoListLookup);
-		messageInfoInvalid = config.getString("messages.info.invalid",
-				messageInfoInvalid);
+		messageInfoChangeSuccess = config.getString("messages.info.changesuccess", messageInfoChangeSuccess);
+		messageInfoLookup = config.getString("messages.info.lookup", messageInfoLookup);
+		messageInfoListLookup = config.getString("messages.info.listlookup", messageInfoListLookup);
+		messageInfoInvalid = config.getString("messages.info.invalid", messageInfoInvalid);
 		messageVersion = config.getString("messages.version", messageVersion);
 		messageWarning = config.getString("messages.warning", messageWarning);
 
@@ -122,10 +107,26 @@ public class AutoSaveConfig {
 			config.setProperty("var.warntime", varWarnTimes);
 		}
 
-		varUuid = UUID.fromString(config.getString("var.uuid", UUID
-				.randomUUID().toString()));
+		varUuid = UUID.fromString(config.getString("var.uuid", UUID.randomUUID().toString()));
 		varReport = config.getBoolean("var.report", varReport);
 
+		config.save();
+	}
+	
+	public void save() {
+		// Values
+		config.setProperty("value.on", valueOn);
+		config.setProperty("value.off", valueOff);
+
+		// Variables
+		config.setProperty("var.debug", varDebug);
+		config.setProperty("var.broadcast", varBroadcast);
+		config.setProperty("var.interval", varInterval);
+		config.setProperty("var.mode", varMode.name());
+		config.setProperty("var.worlds", varWorlds);
+		config.setProperty("var.warntime", varWarnTimes);
+		config.setProperty("var.report", varReport);
+		
 		config.save();
 	}
 }
