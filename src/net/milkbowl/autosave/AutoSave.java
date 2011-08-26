@@ -520,6 +520,7 @@ public class AutoSave extends JavaPlugin {
 
 		if (getServer().getOnlinePlayers().length == 0) {
 			// No players online, don't bother saving.
+			debug("Skipping save, no players online.");
 			return;
 		}
 
@@ -543,7 +544,6 @@ public class AutoSave extends JavaPlugin {
 		debug(String.format("Saved %d Worlds", saved));
 
 		lastSave = new Date();
-		debug("messageBroadcastPost");
 		broadcast(config.messageBroadcastPost);
 
 		// Release
@@ -559,15 +559,13 @@ public class AutoSave extends JavaPlugin {
 	public void broadcast(String message) {
 		if (!message.equals("")) {
 			getServer().broadcastMessage(Generic.parseColor(message));
-			log.info(message);
-			log.info(Generic.stripColor(message));
 			log.info(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
 		}
 	}
 
 	public void debug(String message) {
 		if (config.varDebug) {
-			log.info(Generic.stripColor(String.format("[%s] %s", getDescription().getName(), message)));
+			log.info(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
 		}
 	}
 
