@@ -561,27 +561,22 @@ public class AutoSave extends JavaPlugin {
 			getServer().broadcastMessage(Generic.parseColor(message));
 			log.info(message);
 			log.info(Generic.stripColor(message));
-			log.info(String.format("[%s] %s", getDescription().getName(),
-					Generic.stripColor(message)));
+			log.info(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
 		}
 	}
 
 	public void debug(String message) {
 		if (config.varDebug) {
-			log.info(Generic.stripColor(String.format("[%s] %s",
-					getDescription().getName(), message)));
+			log.info(Generic.stripColor(String.format("[%s] %s", getDescription().getName(), message)));
 		}
 	}
 
 	public void warn(String message) {
-		log.warning(String.format("[%s] %s", getDescription().getName(),
-				Generic.stripColor(message)));
+		log.warning(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
 	}
 
 	public void warn(String message, Exception e) {
-		log.log(Level.WARNING,
-				String.format("[%s] %s", getDescription().getName(),
-						Generic.stripColor(message)), e);
+		log.log(Level.WARNING, String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)), e);
 	}
 
 }
