@@ -1,7 +1,7 @@
 name: AutoSave
 main: net.milkbowl.autosave.AutoSave
 version: 3.0.0dev-b000
-author: Morgan Humes aka Cereal, Xon
+author: Cereal
 description: >
              Provides automatic world saves at defined intervals.  The focus
              of the plugin is to provide a method to flush changes to disk.
