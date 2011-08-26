@@ -73,12 +73,12 @@ public class Generic {
 		message = message.replaceAll("&7", ChatColor.GRAY + "");
 		message = message.replaceAll("&8", ChatColor.DARK_GRAY + "");
 		message = message.replaceAll("&9", ChatColor.BLUE + "");
-		message = message.replaceAll("&a", ChatColor.GREEN + "");
-		message = message.replaceAll("&b", ChatColor.AQUA + "");
-		message = message.replaceAll("&c", ChatColor.RED + "");
-		message = message.replaceAll("&d", ChatColor.LIGHT_PURPLE + "");
-		message = message.replaceAll("&e", ChatColor.YELLOW + "");
-		message = message.replaceAll("&f", ChatColor.WHITE + "");
+		message = message.replaceAll("(?i)&a", ChatColor.GREEN + "");
+		message = message.replaceAll("(?i)&b", ChatColor.AQUA + "");
+		message = message.replaceAll("(?i)&c", ChatColor.RED + "");
+		message = message.replaceAll("(?i)&d", ChatColor.LIGHT_PURPLE + "");
+		message = message.replaceAll("(?i)&e", ChatColor.YELLOW + "");
+		message = message.replaceAll("(?i)&f", ChatColor.WHITE + "");
 		return message;
 	}
 	
@@ -94,12 +94,12 @@ public class Generic {
 		message = message.replaceAll("&7", "");
 		message = message.replaceAll("&8", "");
 		message = message.replaceAll("&9", "");
-		message = message.replaceAll("&a", "");
-		message = message.replaceAll("&b", "");
-		message = message.replaceAll("&c", "");
-		message = message.replaceAll("&d", "");
-		message = message.replaceAll("&e", "");
-		message = message.replaceAll("&f", "");
+		message = message.replaceAll("(?i)&a", "");
+		message = message.replaceAll("(?i)&b", "");
+		message = message.replaceAll("(?i)&c", "");
+		message = message.replaceAll("(?i)&d", "");
+		message = message.replaceAll("(?i)&e", "");
+		message = message.replaceAll("(?i)&f", "");
 		return message;
 	}
 }

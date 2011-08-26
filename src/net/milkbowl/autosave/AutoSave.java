@@ -38,7 +38,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class AutoSave extends JavaPlugin {
-    protected final Logger log = Logger.getLogger("Minecraft");
+	private static final Logger log = Logger.getLogger("Minecraft");
     private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 
     private AutoSaveThread saveThread = null;
@@ -84,7 +84,7 @@ public class AutoSave extends JavaPlugin {
     }
 
     @Override
-    public void onEnable() {
+    public void onEnable() {   	
     	// Load Configuration
     	config = new AutoSaveConfig(getConfiguration());
     	config.load();
@@ -213,14 +213,14 @@ public class AutoSave extends JavaPlugin {
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("interval")) {
                 if (args.length == 1) {
                     // Report interval!
-                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Interval").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varInterval)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABLE\\}", "Interval").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varInterval)));
                     return true;
                 } else if (args.length == 2) {
                     // Change interval!
                     try {
                         int newInterval = Integer.parseInt(args[1]);
                         config.varInterval = newInterval;
-                        sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Interval"));
+                        sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "Interval"));
                         return true;
                     } catch (NumberFormatException e) {
                         sendMessage(sender, config.messageInfoNaN);
@@ -230,7 +230,7 @@ public class AutoSave extends JavaPlugin {
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("warn")) {
                 if (args.length == 1) {
                     // Report interval!
-                	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABE\\}", "Warn Times").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWarnTimes)));
+                	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABLE\\}", "Warn").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWarnTimes)));
                     return true;
                 } else if (args.length == 2) {
                     // Change interval!
@@ -240,7 +240,7 @@ public class AutoSave extends JavaPlugin {
                             tmpWarn.add(Integer.parseInt(s));
                         }
                         config.varWarnTimes = tmpWarn;
-                        sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Warn Times"));
+                        sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "Warn"));
                         return true;
                     } catch (NumberFormatException e) {
                         sendMessage(sender, config.messageInfoNaN);
@@ -250,7 +250,7 @@ public class AutoSave extends JavaPlugin {
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("broadcast")) {
                 if (args.length == 1) {
                     // Report broadcast status!
-                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Broadcast").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABLE\\}", "Broadcast").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varBroadcast ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change broadcast status!
@@ -270,7 +270,7 @@ public class AutoSave extends JavaPlugin {
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("debug")) {
                 if (args.length == 1) {
                     // Report debug status!
-                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Debug").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABLE\\}", "Debug").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varDebug ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change debug status!
@@ -284,13 +284,13 @@ public class AutoSave extends JavaPlugin {
                         return false;
                     }
                     config.varDebug = newSetting;
-                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Debug"));
+                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "Debug"));
                     return true;
                 }
             } else if (args.length >= 1 && args[0].equalsIgnoreCase("report")) {
                 if (args.length == 1) {
                     // Report report status!
-                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABE\\}", "AutoSave Reporting").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff)));
+                	sendMessage(sender, config.messageInfoLookup.replaceAll("\\$\\{VARIABLE\\}", "Report").replaceAll("\\$\\{VALUE\\}", String.valueOf(config.varReport ? config.valueOn : config.valueOff)));
                     return true;
                 } else if (args.length == 2) {
                     // Change report status!
@@ -306,19 +306,19 @@ public class AutoSave extends JavaPlugin {
                         return false;
                     }
                     config.varReport = newSetting;
-                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Reporting"));
+                    sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "Report"));
                     return true;
                 }
             } else if (args.length == 2 && args[0].equalsIgnoreCase("addworld")) {
                 config.varWorlds.add(args[1]);
-                sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Worlds"));
+                sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "Worlds"));
                 return true;
             } else if (args.length == 2 && args[0].equalsIgnoreCase("remworld")) {
                 config.varWorlds.remove(args[1]);
-                sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "AutoSave Worlds"));
+                sendMessage(sender, config.messageInfoChangeSuccess.replaceAll("\\$\\{VARIABLE\\}", "Worlds"));
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("world")) {
-            	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABE\\}", "Worlds").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWorlds)));
+            	sendMessage(sender, config.messageInfoListLookup.replaceAll("\\$\\{VARIABLE\\}", "Worlds").replaceAll("\\$\\{VALUE\\}", Generic.join(", ", config.varWorlds)));
                 return true;
             } else if (args.length == 1 && args[0].equalsIgnoreCase("version")) {
             	sendMessage(sender, String.format("%s%s", ChatColor.BLUE, config.messageVersion.replaceAll("\\$\\{VERSION\\}", getDescription().getVersion()).replaceAll("\\$\\{UUID\\}", config.varUuid.toString())));
@@ -448,6 +448,7 @@ public class AutoSave extends JavaPlugin {
         
 
         lastSave = new Date();
+        debug("messageBroadcastPost");
 		broadcast(config.messageBroadcastPost);
         
         // Release
@@ -463,6 +464,8 @@ public class AutoSave extends JavaPlugin {
     public void broadcast(String message) {
     	if(!message.equals("")) {
     		getServer().broadcastMessage(Generic.parseColor(message));
+    		log.info(message);
+    		log.info(Generic.stripColor(message));
     		log.info(String.format("[%s] %s", getDescription().getName(), Generic.stripColor(message)));
     	}
     }
