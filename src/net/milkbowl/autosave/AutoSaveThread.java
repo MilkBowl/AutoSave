@@ -53,6 +53,17 @@ public class AutoSaveThread extends Thread {
 						plugin.getDescription().getName(), config.varInterval,
 						Generic.join(",", config.varWarnTimes)));
 		while (run) {
+			// Prevent AutoSave from never sleeping
+			// If interval is 0, sleep for 5 seconds and skip saving
+			if(config.varInterval == 0) {
+				try {
+					Thread.sleep(5000);
+				} catch(InterruptedException e) {
+					// care
+				}
+				continue;
+			}
+			
 			// Do our Sleep stuff!
 			for (int i = 0; i < config.varInterval; i++) {
 				try {
