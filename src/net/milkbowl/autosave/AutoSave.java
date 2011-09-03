@@ -20,7 +20,6 @@
 
 package net.milkbowl.autosave;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -47,6 +46,7 @@ public class AutoSave extends JavaPlugin {
 	protected Date lastSave = null;
 	protected int numPlayers = 0;
 	protected boolean saveInProgress = false;
+	protected Boolean bukkitHasSetAutoSave;
 
 	@Override
 	public void onDisable() {
@@ -60,7 +60,12 @@ public class AutoSave extends JavaPlugin {
 		// Enable built-in world saving for ASynchronous Mode
 		if (config.varMode == Mode.ASYNCHRONOUS) {
 			for (World world : getServer().getWorlds()) {
-				((CraftWorld) world).getHandle().canSave = true;
+				if(bukkitHasSetAutoSave) {
+					world.setAutoSave(true);
+				} else {
+					// this should be false because canSave is really noSave
+					((CraftWorld) world).getHandle().canSave = false;
+				}
 			}
 		}
 
@@ -114,11 +119,25 @@ public class AutoSave extends JavaPlugin {
 			getPluginLoader().disablePlugin(this);
 			return;
 		}
+		
+		// Test the waters further, see if setAutoSave exists!
+		try {
+			org.bukkit.World.class.getMethod("setAutoSave", boolean.class);
+			bukkitHasSetAutoSave = true;
+		} catch (NoSuchMethodException e) {
+			// Do nothing, we will work around it anyways
+			bukkitHasSetAutoSave = false;
+		}
 
 		// Disable built-in world saving for ASynchronous Mode
 		if (config.varMode == Mode.ASYNCHRONOUS) {
 			for (World world : getServer().getWorlds()) {
-				((CraftWorld) world).getHandle().canSave = true;
+				if (bukkitHasSetAutoSave) {
+					world.setAutoSave(false);
+				} else {
+					// this should be true because canSave is really noSave
+					((CraftWorld) world).getHandle().canSave = true;
+				}
 			}
 		}
 
