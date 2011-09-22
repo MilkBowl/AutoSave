@@ -38,7 +38,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AutoSave extends JavaPlugin {
 	private static final Logger log = Logger.getLogger("Minecraft");
-	private static final String CONFIG_FILE_NAME = "plugins/AutoSave/config.properties";
 
 	private AutoSaveThread saveThread = null;
 	private ReportThread reportThread = null;
