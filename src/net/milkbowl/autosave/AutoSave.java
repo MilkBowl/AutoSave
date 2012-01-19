@@ -63,7 +63,7 @@ public class AutoSave extends JavaPlugin {
 					world.setAutoSave(true);
 				} else {
 					// this should be false because canSave is really noSave
-					((CraftWorld) world).getHandle().canSave = false;
+					((CraftWorld) world).getHandle().savingDisabled = false;
 				}
 			}
 		}
@@ -135,7 +135,7 @@ public class AutoSave extends JavaPlugin {
 					world.setAutoSave(false);
 				} else {
 					// this should be true because canSave is really noSave
-					((CraftWorld) world).getHandle().canSave = true;
+					((CraftWorld) world).getHandle().savingDisabled = true;
 				}
 			}
 		}
