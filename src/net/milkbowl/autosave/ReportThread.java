@@ -74,40 +74,47 @@ public class ReportThread extends Thread {
 
 		while (true) {
 			try {
-				URL statsUrl = new URL(
-						String.format(
-								"%s?uuid=%s&plugin=%s&version=%s&bVersion=%s&osName=%s&osArch=%s&osVersion=%s&java=%s",
-								statsBaseUrl, URLEncoder.encode(
-										uuid.toString(), "ISO-8859-1"),
-								URLEncoder.encode(pluginName, "ISO-8859-1"),
-								URLEncoder.encode(pluginVersion, "ISO-8859-1"),
-								URLEncoder.encode(bukkitVersion, "ISO-8859-1"),
-								URLEncoder.encode(osName, "ISO-8859-1"),
-								URLEncoder.encode(osArch, "ISO-8859-1"),
-								URLEncoder.encode(osVersion, "ISO-8859-1"),
-								URLEncoder.encode(java, "ISO-8859-1")));
-				URLConnection conn = statsUrl.openConnection();
-				conn.setRequestProperty("User-Agent", String.format("%s %s:%s",
-						"BukkitReport", pluginName, pluginVersion));
-				String inputLine;
-				BufferedReader in = new BufferedReader(new InputStreamReader(
-						conn.getInputStream()));
+				try {
+					URL statsUrl = new URL(
+							String.format(
+									"%s?uuid=%s&plugin=%s&version=%s&bVersion=%s&osName=%s&osArch=%s&osVersion=%s&java=%s",
+									statsBaseUrl,
+									URLEncoder.encode(uuid.toString(),
+											"ISO-8859-1"),
+									URLEncoder.encode(pluginName, "ISO-8859-1"),
+									URLEncoder.encode(pluginVersion,
+											"ISO-8859-1"), URLEncoder.encode(
+											bukkitVersion, "ISO-8859-1"),
+									URLEncoder.encode(osName, "ISO-8859-1"),
+									URLEncoder.encode(osArch, "ISO-8859-1"),
+									URLEncoder.encode(osVersion, "ISO-8859-1"),
+									URLEncoder.encode(java, "ISO-8859-1")));
+					URLConnection conn = statsUrl.openConnection();
+					conn.setRequestProperty("User-Agent", String.format(
+							"%s %s:%s", "BukkitReport", pluginName,
+							pluginVersion));
+					String inputLine;
+					BufferedReader in = new BufferedReader(
+							new InputStreamReader(conn.getInputStream()));
 
-				if (debug) {
-					// Output the contents -- wee
-					log.info(String.format("[%s] StatsURL: %s", pluginName,
-							statsUrl.toString()));
-					while ((inputLine = in.readLine()) != null) {
-						if (inputLine.equals("<pre>")
-								|| inputLine.equals("</pre>")) {
-							continue;
+					if (debug) {
+						// Output the contents -- wee
+						log.info(String.format("[%s] StatsURL: %s", pluginName,
+								statsUrl.toString()));
+						while ((inputLine = in.readLine()) != null) {
+							if (inputLine.equals("<pre>")
+									|| inputLine.equals("</pre>")) {
+								continue;
+							}
+							log.info(String.format("[%s] %s", pluginName,
+									inputLine));
 						}
-						log.info(String
-								.format("[%s] %s", pluginName, inputLine));
 					}
-				}
 
-				in.close();
+					in.close();
+				} catch (Exception e) {
+					// care
+				}
 
 				// Sleep for 6 hours...
 				for (int i = 0; i < REPORT_DELAY; i++) {
@@ -121,8 +128,10 @@ public class ReportThread extends Thread {
 					}
 					Thread.sleep(1000);
 				}
-			} catch (Exception e) {
-				// Ignore it...really its just not important
+			} catch (InterruptedException e) {
+				// If this happens, lets stop reporting
+				setRun(false);
+				return;
 			}
 		}
 	}
